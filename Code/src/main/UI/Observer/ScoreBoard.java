@@ -1,7 +1,7 @@
-package UI.Observer;
+package main.UI.Observer;
 
-import Core.GameEngine;
-import Entities.Player;
+import main.Core.GameEngine;
+import main.Entities.Player;
 
 public class ScoreBoard implements GameObserver {
     @Override

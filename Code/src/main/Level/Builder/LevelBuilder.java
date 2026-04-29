@@ -1,6 +1,6 @@
-package Level.Builder;
+package main.Level.Builder;
 
-import Level.Level;
+import main.Level.Level;
 import java.awt.Point;
 
 public interface LevelBuilder {

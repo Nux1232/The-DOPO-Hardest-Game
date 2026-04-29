@@ -1,4 +1,4 @@
-package Core;
+package main.Core;
 
 public enum GameState {
     MENU,

@@ -1,9 +1,9 @@
-package Level;
+package main.Level;
 
 import java.util.ArrayList;
 import java.util.List;
-import Entities.Enemy;
-import Entities.Coin;
+import main.Entities.Enemy;
+import main.Entities.Coin;
 import java.awt.Point;
 
 public class Level {

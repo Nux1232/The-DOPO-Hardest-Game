@@ -1,4 +1,4 @@
-package Entities.State;
+package main.Entities.State;
 
 public class PenalizedState implements PlayerState {
     @Override
