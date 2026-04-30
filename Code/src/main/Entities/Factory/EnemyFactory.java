@@ -1,23 +1,26 @@
-package Entities.Factory;
+package main.Entities.Factory;
 
-import Entities.Enemy;
-import Entities.Strategy.MovementStrategy;
-// Importar estrategias concretas cuando existan
+import main.Entities.Enemy;
+import Entities.Strategy.LinearMovement;
+import Entities.Strategy.PatrolMovement;
 
 public class EnemyFactory {
     public static Enemy createEnemy(String type, double x, double y) {
-        Enemy enemy = new Enemy();
-        // Aquí se le asignará la posición y la estrategia de movimiento
+        Enemy enemy = new Enemy(x, y);
+        if (type == null) type = "BASICO";
+        
         switch (type.toUpperCase()) {
             case "RAPIDO":
-                // Lógica para configurar velocidad 2x
+                // Velocidad 2.0 para el tipo rápido
+                enemy.setMovementStrategy(new LinearMovement(2.0, true));
                 break;
             case "PATRULLERO":
-                // Lógica para asignar PatrolMovement
+                enemy.setMovementStrategy(new PatrolMovement());
                 break;
             case "BASICO":
             default:
-                // Lógica para asignar LinearMovement
+                // Velocidad 1.0 estándar
+                enemy.setMovementStrategy(new LinearMovement(1.0, true));
                 break;
         }
         return enemy;

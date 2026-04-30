@@ -1,7 +1,7 @@
-package UI;
+package main.UI;
 
-import Core.GameEngine;
-import UI.Observer.GameObserver;
+import main.Core.GameEngine;
+import main.UI.Observer.GameObserver;
 
 /**
  * GamePanel - El área donde se dibuja el juego.

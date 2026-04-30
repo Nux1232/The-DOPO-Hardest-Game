@@ -1,6 +1,6 @@
-package UI.Observer;
+package main.UI.Observer;
 
-import Core.GameEngine;
+import main.Core.GameEngine;
 
 public class TimerDisplay implements GameObserver {
     @Override

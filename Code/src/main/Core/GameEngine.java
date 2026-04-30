@@ -1,10 +1,10 @@
-package Core;
+package main.Core;
 
 import java.util.ArrayList;
 import java.util.List;
-import Entities.Player;
-import Level.Level;
-import UI.Observer.GameObserver;
+import main.Entities.Player;
+import main.Level.Level;
+import main.UI.Observer.GameObserver;
 
 /**
  * GameEngine - Implementación del motor principal del juego.

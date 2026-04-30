@@ -1,4 +1,4 @@
-package Exceptions;
+package main.Exceptions;
 
 public class GameOverException extends Exception {
     public GameOverException(String message) {

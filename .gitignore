@@ -1,5 +1,19 @@
-.DS_Store
+
 Code/.idea/workspace.xml
 Code/RESUMEN_PROYECTO.txt
 /Code/src/.idea
 /Code/.idea
+/.idea
+
+# Archivos de configuración de IntelliJ (como el .iml que tienes)
+*.iml
+.idea/
+
+# Carpetas de salida y compilación
+out/
+bin/
+target/
+
+# Archivos temporales del sistema
+Thumbs.db
+.DS_Store

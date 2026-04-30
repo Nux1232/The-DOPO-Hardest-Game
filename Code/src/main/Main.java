@@ -1,11 +1,11 @@
 package main;
 
-import Core.GameEngine;
-import Level.Builder.ConcreteLevelBuilder;
-import Level.Builder.LevelBuilder;
-import Level.Level;
-import Entities.Factory.PlayerFactory;
-import UI.MainWindow;
+import main.Core.GameEngine;
+import main.Level.Builder.ConcreteLevelBuilder;
+import main.Level.Builder.LevelBuilder;
+import main.Level.Level;
+import main.Entities.Factory.PlayerFactory;
+import main.UI.MainWindow;
 
 public class Main {
     public static void main(String[] args) {

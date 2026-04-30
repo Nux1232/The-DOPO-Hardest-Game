@@ -1,8 +1,8 @@
-package UI;
+package main.UI;
 
-import Core.GameEngine;
-import UI.Observer.ScoreBoard;
-import UI.Observer.TimerDisplay;
+import main.Core.GameEngine;
+import main.UI.Observer.ScoreBoard;
+import main.UI.Observer.TimerDisplay;
 
 public class MainWindow {
     private GamePanel gamePanel;

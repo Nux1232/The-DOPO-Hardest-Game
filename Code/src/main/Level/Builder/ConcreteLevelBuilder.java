@@ -1,8 +1,8 @@
-package Level.Builder;
+package main.Level.Builder;
 
-import Level.Level;
-import Entities.Factory.EnemyFactory;
-import Entities.Coin;
+import main.Level.Level;
+import main.Entities.Factory.EnemyFactory;
+import main.Entities.Coin;
 import java.awt.Point;
 
 public class ConcreteLevelBuilder implements LevelBuilder {
@@ -44,8 +44,7 @@ public class ConcreteLevelBuilder implements LevelBuilder {
 
     @Override
     public LevelBuilder addCoin(int x, int y) {
-        // En una implementación real, Coin también podría tener una posición
-        level.addCoin(new Coin()); 
+        level.addCoin(new Coin(x, y)); 
         return this;
     }
 
