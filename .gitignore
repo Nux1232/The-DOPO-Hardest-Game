@@ -17,3 +17,5 @@ target/
 # Archivos temporales del sistema
 Thumbs.db
 .DS_Store
+resumen_cambios.txt
+sources.txt

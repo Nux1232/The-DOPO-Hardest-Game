@@ -1,8 +1,7 @@
 package main.Entities.Factory;
 
 import main.Entities.Enemy;
-import main.Entities.Strategy.LinearMovement;
-import main.Entities.Strategy.PatrolMovement;
+import main.Entities.Strategy.*;
 
 public class EnemyFactory {
     public static Enemy createEnemy(String type, double x, double y) {
@@ -11,16 +10,17 @@ public class EnemyFactory {
         
         switch (type.toUpperCase()) {
             case "RAPIDO":
-                // Velocidad 2.0 para el tipo rápido
-                enemy.setMovementStrategy(new LinearMovement(2.0, true));
+                enemy.setMovementStrategy(new LinearMovement(3.0, true));
                 break;
             case "PATRULLERO":
-                enemy.setMovementStrategy(new PatrolMovement());
+                enemy.setMovementStrategy(new CircularMovement(x, y));
+                break;
+            case "VERTICAL":
+                enemy.setMovementStrategy(new VerticalMovement(2.0));
                 break;
             case "BASICO":
             default:
-                // Velocidad 1.0 estándar
-                enemy.setMovementStrategy(new LinearMovement(1.0, true));
+                enemy.setMovementStrategy(new LinearMovement(1.5, true));
                 break;
         }
         return enemy;

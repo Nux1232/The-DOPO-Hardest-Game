@@ -1,15 +1,11 @@
 package main.UI;
 
 import main.Core.GameEngine;
-import main.Entities.Player;
-import main.Entities.Enemy;
+import main.Entities.*;
 import main.UI.Observer.GameObserver;
 import javax.swing.JPanel;
-import java.awt.Graphics;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,68 +14,75 @@ public class GamePanel extends JPanel implements GameObserver {
     
     public GamePanel() {
         setPreferredSize(new Dimension(800, 600));
-        setBackground(Color.WHITE);
+        setBackground(new Color(230, 230, 255));
         setFocusable(true);
-        
         GameEngine.getInstance().addObserver(this);
 
         addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                pressedKeys.add(e.getKeyCode());
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                pressedKeys.remove(e.getKeyCode());
-            }
+            public void keyPressed(KeyEvent e) { pressedKeys.add(e.getKeyCode()); }
+            public void keyReleased(KeyEvent e) { pressedKeys.remove(e.getKeyCode()); }
         });
     }
 
     private void handleInput() {
         if (GameEngine.getInstance().getPlayers().isEmpty()) return;
-        Player player = GameEngine.getInstance().getPlayers().get(0);
-        if (pressedKeys.contains(KeyEvent.VK_UP) || pressedKeys.contains(KeyEvent.VK_W)) player.move("UP");
-        if (pressedKeys.contains(KeyEvent.VK_DOWN) || pressedKeys.contains(KeyEvent.VK_S)) player.move("DOWN");
-        if (pressedKeys.contains(KeyEvent.VK_LEFT) || pressedKeys.contains(KeyEvent.VK_A)) player.move("LEFT");
-        if (pressedKeys.contains(KeyEvent.VK_RIGHT) || pressedKeys.contains(KeyEvent.VK_D)) player.move("RIGHT");
+        Player p = GameEngine.getInstance().getPlayers().get(0);
+        if (pressedKeys.contains(KeyEvent.VK_UP)) p.move("UP");
+        if (pressedKeys.contains(KeyEvent.VK_DOWN)) p.move("DOWN");
+        if (pressedKeys.contains(KeyEvent.VK_LEFT)) p.move("LEFT");
+        if (pressedKeys.contains(KeyEvent.VK_RIGHT)) p.move("RIGHT");
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        
-        // Dibujar Jugadores
-        for (Player p : GameEngine.getInstance().getPlayers()) {
-            g.setColor(parseColor(p.getColor()));
-            int size = (int) (20 * p.getSizeMultiplier());
-            g.fillRect((int) p.getX(), (int) p.getY(), size, size);
-            g.setColor(Color.BLACK);
-            g.drawRect((int) p.getX(), (int) p.getY(), size, size);
-        }
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Dibujar Enemigos
+        // 1. Dibujar Monedas
         if (GameEngine.getInstance().getCurrentLevel() != null) {
-            g.setColor(Color.BLUE);
-            for (Enemy e : GameEngine.getInstance().getCurrentLevel().getEnemies()) {
-                g.fillOval((int) e.getX(), (int) e.getY(), 15, 15);
-                g.setColor(Color.BLACK);
-                g.drawOval((int) e.getX(), (int) e.getY(), 15, 15);
-                g.setColor(Color.BLUE);
+            for (Coin c : GameEngine.getInstance().getCurrentLevel().getCoins()) {
+                if (!c.isCollected()) {
+                    g2.setColor(parseCoinColor(c.getType()));
+                    g2.fillOval((int)c.getX(), (int)c.getY(), 10, 10);
+                    g2.setColor(Color.BLACK);
+                    g2.drawOval((int)c.getX(), (int)c.getY(), 10, 10);
+                }
             }
         }
 
-        g.setColor(Color.BLACK);
-        g.drawString("Mueve al jugador con las flechas o WASD. ¡Evita los círculos azules!", 20, 20);
+        // 2. Dibujar Enemigos
+        g2.setColor(Color.BLUE);
+        if (GameEngine.getInstance().getCurrentLevel() != null) {
+            for (Enemy e : GameEngine.getInstance().getCurrentLevel().getEnemies()) {
+                g2.fillOval((int)e.getX(), (int)e.getY(), 15, 15);
+            }
+        }
+
+        // 3. Dibujar Jugadores
+        for (Player p : GameEngine.getInstance().getPlayers()) {
+            g2.setColor(parsePlayerColor(p.getColor()));
+            int size = (int)(20 * p.getSizeMultiplier());
+            g2.fillRect((int)p.getX(), (int)p.getY(), size, size);
+            g2.setColor(Color.BLACK);
+            g2.drawRect((int)p.getX(), (int)p.getY(), size, size);
+        }
     }
 
-    private Color parseColor(String colorName) {
-        switch (colorName.toUpperCase()) {
-            case "VERDE": return Color.GREEN;
-            case "ROJO": return Color.RED;
-            case "AZUL": return Color.BLUE;
-            default: return Color.GRAY;
+    private Color parseCoinColor(String type) {
+        switch(type.toUpperCase()){
+            case "YELLOW": return Color.YELLOW;
+            case "RED": return Color.RED;
+            case "BLUE": return Color.BLUE;
+            case "GREEN": return Color.GREEN;
+            default: return Color.YELLOW;
         }
+    }
+
+    private Color parsePlayerColor(String color) {
+        if (color.equalsIgnoreCase("VERDE")) return Color.GREEN;
+        if (color.equalsIgnoreCase("AZUL")) return Color.BLUE;
+        return Color.RED;
     }
 
     @Override

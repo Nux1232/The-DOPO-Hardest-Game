@@ -43,8 +43,8 @@ public class ConcreteLevelBuilder implements LevelBuilder {
     }
 
     @Override
-    public LevelBuilder addCoin(int x, int y) {
-        level.addCoin(new Coin(x, y)); 
+    public LevelBuilder addCoin(int x, int y, String type) {
+        level.addCoin(new Coin(x, y, type)); 
         return this;
     }
 
