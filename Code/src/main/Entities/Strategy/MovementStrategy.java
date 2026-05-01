@@ -1,5 +1,7 @@
-package Entities.Strategy;
+package main.Entities.Strategy;
+
+import main.Entities.Enemy;
 
 public interface MovementStrategy {
-    void move();
+    void move(Enemy enemy);
 }

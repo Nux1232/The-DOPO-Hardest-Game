@@ -1,8 +1,8 @@
 package main.Entities.Factory;
 
 import main.Entities.Enemy;
-import Entities.Strategy.LinearMovement;
-import Entities.Strategy.PatrolMovement;
+import main.Entities.Strategy.LinearMovement;
+import main.Entities.Strategy.PatrolMovement;
 
 public class EnemyFactory {
     public static Enemy createEnemy(String type, double x, double y) {

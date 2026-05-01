@@ -1,6 +1,6 @@
 package main.Entities;
 
-import Entities.Strategy.MovementStrategy;
+import main.Entities.Strategy.MovementStrategy;
 
 public class Enemy {
     private double x, y;
@@ -13,7 +13,7 @@ public class Enemy {
 
     public void update() {
         if (movementStrategy != null) {
-            movementStrategy.move();
+            movementStrategy.move(this);
         }
     }
 

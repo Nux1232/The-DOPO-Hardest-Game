@@ -22,7 +22,12 @@ public class Player {
     }
 
     public void move(String direction) {
-        // Lógica de movimiento
+        switch (direction.toUpperCase()) {
+            case "UP": y -= speed; break;
+            case "DOWN": y += speed; break;
+            case "LEFT": x -= speed; break;
+            case "RIGHT": x += speed; break;
+        }
     }
 
     public void resetPosition(double x, double y) {

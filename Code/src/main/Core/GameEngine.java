@@ -3,13 +3,11 @@ package main.Core;
 import java.util.ArrayList;
 import java.util.List;
 import main.Entities.Player;
+import main.Entities.Enemy;
 import main.Level.Level;
 import main.UI.Observer.GameObserver;
+import java.awt.geom.Rectangle2D;
 
-/**
- * GameEngine - Implementación del motor principal del juego.
- * Gestiona el bucle de 60 FPS, el estado del juego, el tiempo y los observadores.
- */
 public class GameEngine implements Runnable {
     private static GameEngine instance;
     
@@ -20,12 +18,11 @@ public class GameEngine implements Runnable {
     private final int FPS = 60;
     private final long TARGET_TIME = 1000000000 / FPS;
 
-    // Estado de la partida
     private Level currentLevel;
     private List<Player> players;
     private List<GameObserver> observers;
     
-    private int remainingTime; // en segundos
+    private int remainingTime;
     private long lastSecondTime;
 
     private GameEngine() {
@@ -41,8 +38,6 @@ public class GameEngine implements Runnable {
         return instance;
     }
 
-    // --- Gestión de Observadores ---
-    
     public void addObserver(GameObserver observer) {
         observers.add(observer);
     }
@@ -52,12 +47,11 @@ public class GameEngine implements Runnable {
     }
 
     private void notifyObservers() {
-        for (GameObserver observer : observers) {
+        List<GameObserver> copy = new ArrayList<>(observers);
+        for (GameObserver observer : copy) {
             observer.update();
         }
     }
-
-    // --- Control del Hilo ---
 
     public synchronized void startGame() {
         if (running) return;
@@ -68,7 +62,6 @@ public class GameEngine implements Runnable {
 
     public synchronized void stopGame() {
         running = false;
-        // En una implementación real, esperaríamos a que el hilo termine.
     }
 
     @Override
@@ -86,67 +79,72 @@ public class GameEngine implements Runnable {
                 lastTime = now;
             }
 
-            // Gestión del cronómetro (1 segundo)
             if (System.currentTimeMillis() - lastSecondTime >= 1000) {
                 if (currentState == GameState.PLAYING && remainingTime > 0) {
                     remainingTime--;
-                    if (remainingTime <= 0) {
-                        handleTimeOut();
-                    }
                 }
                 lastSecondTime = System.currentTimeMillis();
             }
 
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            try { Thread.sleep(1); } catch (InterruptedException e) {}
         }
     }
 
     private void update() {
-        if (currentState == GameState.PLAYING) {
-            // 1. Actualizar jugadores
-            // 2. Actualizar enemigos del currentLevel
-            // 3. Verificar colisiones y recolección de monedas
-            // 4. Verificar condición de victoria o muerte
+        if (currentState == GameState.PLAYING && currentLevel != null) {
+            // 1. Actualizar enemigos
+            for (Enemy e : currentLevel.getEnemies()) {
+                e.update();
+            }
+
+            // 2. Verificar colisiones Jugador vs Enemigos
+            checkCollisions();
+        }
+    }
+
+    private void checkCollisions() {
+        for (Player p : players) {
+            double pSize = 20 * p.getSizeMultiplier();
+            Rectangle2D.Double playerRect = new Rectangle2D.Double(p.getX(), p.getY(), pSize, pSize);
+
+            for (Enemy e : currentLevel.getEnemies()) {
+                // Los enemigos se dibujan de 15x15
+                Rectangle2D.Double enemyRect = new Rectangle2D.Double(e.getX(), e.getY(), 15, 15);
+                
+                if (playerRect.intersects(enemyRect)) {
+                    handlePlayerDeath(p);
+                    break; 
+                }
+            }
+        }
+    }
+
+    private void handlePlayerDeath(Player p) {
+        p.incrementDeaths();
+        System.out.println("¡Colisión! Muertes totales de " + p.getName() + ": " + p.getDeaths());
+        if (currentLevel.getStartPoint() != null) {
+            p.resetPosition(currentLevel.getStartPoint().getX(), currentLevel.getStartPoint().getY());
         }
     }
 
     private void render() {
-        // Notificar a la UI que debe redibujarse
         notifyObservers();
     }
 
-    private void handleTimeOut() {
-        // Lógica cuando se acaba el tiempo de 3 minutos
-        System.out.println("¡Tiempo agotado!");
-        currentState = GameState.GAME_OVER;
-    }
-
-    // --- Métodos de Control de Juego ---
-
     public void loadLevel(Level level) {
         this.currentLevel = level;
-        this.remainingTime = 180; // 3 minutos por defecto
+        this.remainingTime = 180;
         this.currentState = GameState.PLAYING;
-    }
-
-    public void pauseGame() {
-        if (currentState == GameState.PLAYING) {
-            currentState = GameState.PAUSED;
+        
+        if (level.getStartPoint() != null) {
+            for (Player p : players) {
+                p.resetPosition(level.getStartPoint().getX(), level.getStartPoint().getY());
+            }
         }
     }
 
-    public void resumeGame() {
-        if (currentState == GameState.PAUSED) {
-            currentState = GameState.PLAYING;
-        }
-    }
-
-    // Getters
     public GameState getCurrentState() { return currentState; }
     public int getRemainingTime() { return remainingTime; }
     public List<Player> getPlayers() { return players; }
+    public Level getCurrentLevel() { return currentLevel; }
 }

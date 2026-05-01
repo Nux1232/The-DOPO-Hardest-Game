@@ -37,4 +37,5 @@ public class Level {
     public int getId() { return id; }
     public List<Enemy> getEnemies() { return enemies; }
     public List<Coin> getCoins() { return coins; }
+    public Point getStartPoint() { return startPoint; }
 }

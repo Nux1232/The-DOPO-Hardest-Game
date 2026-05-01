@@ -11,9 +11,9 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("--- Iniciando The DOPO Hardest Game ---");
 
-        // 1. Inicializar la UI (y sus observadores)
+        // 1. Inicializar la UI
         MainWindow window = new MainWindow();
-        window.show();
+        window.showWindow();
 
         // 2. Crear un jugador usando la Factory
         GameEngine engine = GameEngine.getInstance();
@@ -32,16 +32,5 @@ public class Main {
         System.out.println("Cargando Nivel 1...");
         engine.loadLevel(level1);
         engine.startGame();
-
-        // Simulación: Esperar 3 segundos y mostrar que el motor está corriendo
-        try {
-            Thread.sleep(3000);
-            System.out.println("Simulación terminada. Estado actual: " + engine.getCurrentState());
-            System.out.println("Tiempo restante en el motor: " + engine.getRemainingTime() + "s");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        
-        System.exit(0);
     }
 }
