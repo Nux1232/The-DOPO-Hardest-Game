@@ -3,7 +3,20 @@ package main.UI.Observer;
 import main.Core.GameEngine;
 import main.Entities.Player;
 
+/**
+ * Clase que implementa la puntuación del juego.
+ *
+ * @author Juan Pablo Cuervo Contreras
+ * @author David Felipe Ortiz Salcedo
+ * @version 01/05/2026
+ */
+
 public class ScoreBoard implements GameObserver {
+
+    /**
+     * Método que actualiza el estado del juego para mostrar
+     * la puntuación.
+     */
     @Override
     public void update() {
         GameEngine engine = GameEngine.getInstance();
@@ -13,5 +26,5 @@ public class ScoreBoard implements GameObserver {
             // System.out.println("Jugador: " + p.getName() + " | Muertes: " + p.getDeaths());
         }
         // Mostrar también monedas recolectadas si el nivel está cargado
-    }
-}
+    } // Cierre del método
+} // Cierre de la clase

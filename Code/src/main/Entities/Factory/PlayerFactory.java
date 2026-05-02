@@ -1,18 +1,38 @@
 package main.Entities.Factory;
 
 import main.Entities.Player;
+import main.Entities.Blinky;
+import main.Entities.Inky;
+import main.Entities.Clyde;
 
+/**
+ * Clase que crea un jugador utilizando el patron de diseño Factory.
+ *
+ * @author Juan Pablo Cuervo Contreras
+ * @author David Felipe Ortiz Salcedo
+ * @version 02/05/2026
+ */
 public class PlayerFactory {
+    /**
+     * Método que permite crear un jugador.
+     *
+     * @param name El nombre del jugador.
+     * @param type El tipo de jugador.
+     * @return Player El jugador creado.
+     */
     public static Player createPlayer(String name, String type) {
-        if (type == null) type = "ROJO";
+        if (type == null) type = "BLINKY";
         switch (type.toUpperCase()) {
+            case "INKY":
             case "AZUL":
-                return new Player(name, "AZUL", 1.5, 0.8);
+                return new Inky(name);
+            case "CLYDE":
             case "VERDE":
-                return new Player(name, "VERDE", 1.0, 1.0);
+                return new Clyde(name);
+            case "BLINKY":
             case "ROJO":
             default:
-                return new Player(name, "ROJO", 1.0, 1.0);
+                return new Blinky(name);
         }
-    }
-}
+    } // Cierre del método
+} // Cierre de la clase
