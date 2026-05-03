@@ -7,6 +7,7 @@ import main.UI.Observer.GameObserver;
 import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.AffineTransform;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,19 +20,29 @@ import java.util.Set;
  */
 
 public class GamePanel extends JPanel implements GameObserver {
+    private static final int WORLD_WIDTH = 800;
+    private static final int WORLD_HEIGHT = 600;
     private final Set<Integer> pressedKeys = new HashSet<>();
+    private Runnable pauseAction;
 
     /**
      * Contructor de la clase GamePanel.
      */
     public GamePanel() {
-        setPreferredSize(new Dimension(800, 600));
+        setPreferredSize(new Dimension(WORLD_WIDTH, WORLD_HEIGHT));
         setBackground(new Color(173, 216, 230));
         setFocusable(true);
         GameEngine.getInstance().addObserver(this);
 
         addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e) { pressedKeys.add(e.getKeyCode()); }
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    pressedKeys.clear();
+                    if (pauseAction != null) pauseAction.run();
+                    return;
+                }
+                pressedKeys.add(e.getKeyCode());
+            }
             public void keyReleased(KeyEvent e) { pressedKeys.remove(e.getKeyCode()); }
         });
 
@@ -39,6 +50,14 @@ public class GamePanel extends JPanel implements GameObserver {
             if (isShowing()) requestFocusInWindow();
         });
     } // Cierre del constructor
+
+    public void setPauseAction(Runnable pauseAction) {
+        this.pauseAction = pauseAction;
+    }
+
+    public void clearPressedKeys() {
+        pressedKeys.clear();
+    }
 
     /**
      * Método privado que maneja el movimiento del jugador.
@@ -63,9 +82,9 @@ public class GamePanel extends JPanel implements GameObserver {
         if(GameEngine.getInstance().getCurrentLevel() == null) return;
         int radius = 10;
         int diameter = 15;
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g;
+        Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        applyWorldTransform(g2);
         Level level = GameEngine.getInstance().getCurrentLevel();
 
         // Pared
@@ -114,9 +133,56 @@ public class GamePanel extends JPanel implements GameObserver {
             g2.setColor(parsePlayerColor(p.getColor()));
             int size = (int)(20 * p.getSizeMultiplier());
             g2.fillRect((int)p.getX(), (int)p.getY(), size, size);
-            g2.setColor(Color.BLACK);
+            g2.setColor(p.getBorderColor());
+            g2.setStroke(new BasicStroke(3));
             g2.drawRect((int)p.getX(), (int)p.getY(), size, size);
+            g2.setStroke(new BasicStroke(1));
         }
+
+        drawHud(g2);
+        g2.dispose();
+    } // Cierre del método
+
+    private void applyWorldTransform(Graphics2D g2) {
+        double scaleX = getWidth() / (double) WORLD_WIDTH;
+        double scaleY = getHeight() / (double) WORLD_HEIGHT;
+        double scale = Math.min(scaleX, scaleY);
+        double offsetX = (getWidth() - WORLD_WIDTH * scale) / 2.0;
+        double offsetY = (getHeight() - WORLD_HEIGHT * scale) / 2.0;
+
+        g2.translate(offsetX, offsetY);
+        g2.scale(scale, scale);
+    } // Cierre del método
+
+    private void drawHud(Graphics2D g2) {
+        GameEngine engine = GameEngine.getInstance();
+        int time = engine.getRemainingTime();
+        int minutes = time / 60;
+        int seconds = time % 60;
+        int deaths = engine.getPlayers().isEmpty() ? 0 : engine.getPlayers().get(0).getDeaths();
+
+        String coinsText = "Monedas: " + engine.getCollectedCoinsCount() + "/" + engine.getTotalCoinsCount();
+        String timeText = String.format("Tiempo: %02d:%02d", minutes, seconds);
+        String deathsText = "Muertes: " + deaths;
+
+        g2.setFont(new Font("Arial", Font.BOLD, 16));
+        FontMetrics metrics = g2.getFontMetrics();
+        int padding = 10;
+        int lineHeight = metrics.getHeight();
+        int boxWidth = Math.max(metrics.stringWidth(coinsText),
+                Math.max(metrics.stringWidth(timeText), metrics.stringWidth(deathsText))) + padding * 2;
+        int boxHeight = lineHeight * 3 + padding * 2;
+
+        g2.setColor(new Color(255, 255, 255, 220));
+        g2.fillRoundRect(12, 12, boxWidth, boxHeight, 8, 8);
+        g2.setColor(Color.BLACK);
+        g2.drawRoundRect(12, 12, boxWidth, boxHeight, 8, 8);
+
+        int textX = 12 + padding;
+        int textY = 12 + padding + metrics.getAscent();
+        g2.drawString(coinsText, textX, textY);
+        g2.drawString(timeText, textX, textY + lineHeight);
+        g2.drawString(deathsText, textX, textY + lineHeight * 2);
     } // Cierre del método
 
     /**

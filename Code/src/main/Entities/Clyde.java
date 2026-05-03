@@ -9,7 +9,7 @@ package main.Entities;
  */
 
 public class Clyde extends Player {
-    private static final double SPEED = 1.0;
+    private static final double SPEED = 1.25;
     private static final double SIZE = 1.0;
     private static final int INVINCIBILITY_FRAMES = 60;
 
@@ -35,7 +35,7 @@ public class Clyde extends Player {
 
         if (hasShield) {
             hasShield = false;
-            currentSpeed = 0.7; // Baja velocidad a 0.7x
+            currentSpeed = baseSpeed * 0.7;
             isInvincible = true;
             invincibilityTimer = INVINCIBILITY_FRAMES;
             System.out.println("¡Escudo roto! Velocidad reducida.");

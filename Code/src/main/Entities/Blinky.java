@@ -9,7 +9,7 @@ package main.Entities;
  */
 
 public class Blinky extends Player {
-    private static final double SPEED = 1.0;
+    private static final double SPEED = 1.25;
     private static final double SIZE = 1.0;
 
     /**

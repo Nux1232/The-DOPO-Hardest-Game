@@ -1,7 +1,6 @@
 package main.Entities;
 
-import main.Entities.State.NormalState;
-import main.Entities.State.PlayerState;
+import java.awt.Color;
 
 /**
  * Clase abstracta que representa a un jugador.
@@ -15,6 +14,7 @@ public abstract class Player {
     private String name;
     private String originalColor;
     private String currentColor;
+    private Color borderColor;
     private int deaths;
     private double x, y;
     protected double baseSpeed;
@@ -37,6 +37,7 @@ public abstract class Player {
         this.name = name;
         this.originalColor = color;
         this.currentColor = color;
+        this.borderColor = Color.BLACK;
         this.baseSpeed = speed;
         this.currentSpeed = speed;
         this.sizeMultiplier = sizeMultiplier;
@@ -173,6 +174,24 @@ public abstract class Player {
      */
     public String getColor() {
         return currentColor;
+    } // Cierre del método
+
+    /**
+     * Método que define el color del borde del jugador.
+     *
+     * @param borderColor El color del borde.
+     */
+    public void setBorderColor(Color borderColor) {
+        this.borderColor = borderColor;
+    } // Cierre del método
+
+    /**
+     * Método que devuelve el color del borde del jugador.
+     *
+     * @return Color El color del borde.
+     */
+    public Color getBorderColor() {
+        return borderColor;
     } // Cierre del método
 
     /**

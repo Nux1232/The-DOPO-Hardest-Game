@@ -21,8 +21,8 @@ import java.awt.geom.Rectangle2D;
 public class GameEngine implements Runnable {
     private static GameEngine instance;
     private Thread gameThread;
-    private boolean running;
-    private GameState currentState;
+    private volatile boolean running;
+    private volatile GameState currentState;
     private final int FPS = 60;
     private final long TARGET_TIME = 1000000000 / FPS;
 
@@ -68,12 +68,40 @@ public class GameEngine implements Runnable {
         gameThread.start();
     } // Cierre del método
 
+    public void pauseGame() {
+        if (currentState == GameState.PLAYING) {
+            currentState = GameState.PAUSED;
+        }
+    }
+
+    public void resumeGame() {
+        if (currentState == GameState.PAUSED) {
+            currentState = GameState.PLAYING;
+        }
+    }
+
     /**
      * Método que pausa el juego donde solo un hilo lo ejecute a la vez.
      */
     public synchronized void stopGame() {
         running = false;
     } // Cierre del método
+
+    public synchronized void returnToMenu() {
+        running = false;
+        currentState = GameState.MENU;
+        currentLevel = null;
+        players.clear();
+
+        if (gameThread != null && gameThread != Thread.currentThread()) {
+            try {
+                gameThread.join(500);
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        gameThread = null;
+    }
 
     /**
      * Método que ejecuta el juego.
@@ -112,6 +140,7 @@ public class GameEngine implements Runnable {
         for (Enemy e : currentLevel.getEnemies()) e.update();
         checkCollisions();
         checkCoinCollection();
+        checkLevelCompletion();
     } // Cierre del método
 
     /**
@@ -191,9 +220,24 @@ public class GameEngine implements Runnable {
      */
     private void handleCoinEffect(Player p, Coin c) {
         String type = c.getType().toUpperCase();
-        if (type.equals("RED")) p.applySkin("ROJO", 1.0, 1.0);
-        else if (type.equals("BLUE")) p.applySkin("AZUL", 1.5, 1.5);
-        else if (type.equals("GREEN")) p.applySkin("VERDE", 1.0, 1.0);
+        if (type.equals("RED")) p.applySkin("ROJO", 1.25, 1.0);
+        else if (type.equals("BLUE")) p.applySkin("AZUL", 1.75, 1.5);
+        else if (type.equals("GREEN")) p.applySkin("VERDE", 1.25, 1.0);
+    } // Cierre del método
+
+    private void checkLevelCompletion() {
+        Point finalSafeZone = currentLevel.getFinalSafeZone();
+        if (finalSafeZone == null) return;
+
+        Rectangle finalZoneRect = new Rectangle(finalSafeZone.x, finalSafeZone.y, 60, 60);
+        for (Player p : players) {
+            Rectangle2D.Double pRect = new Rectangle2D.Double(p.getX(), p.getY(),
+                    20 * p.getSizeMultiplier(), 20 * p.getSizeMultiplier());
+            if (pRect.intersects(finalZoneRect)) {
+                currentState = GameState.VICTORY;
+                return;
+            }
+        }
     } // Cierre del método
 
     /**
@@ -211,7 +255,7 @@ public class GameEngine implements Runnable {
     public void loadLevel(Level level) {
         this.currentLevel = level;
         this.currentState = GameState.PLAYING;
-        this.remainingTime = 180;
+        this.remainingTime = level.getTimeLimit();
         for (Player p : players) {
             if (level.getStartPoint() != null) {
                 p.setRespawnPoint(level.getStartPoint().getX(), level.getStartPoint().getY());
@@ -244,6 +288,20 @@ public class GameEngine implements Runnable {
      */
     public int getRemainingTime() {
         return remainingTime;
+    } // Cierre del método
+
+    public int getCollectedCoinsCount() {
+        if (currentLevel == null) return 0;
+        int collectedCoins = 0;
+        for (Coin c : currentLevel.getCoins()) {
+            if (c.isCollected()) collectedCoins++;
+        }
+        return collectedCoins;
+    } // Cierre del método
+
+    public int getTotalCoinsCount() {
+        if (currentLevel == null) return 0;
+        return currentLevel.getCoins().size();
     } // Cierre del método
 
     /**

@@ -9,7 +9,7 @@ package main.Entities;
  */
 
 public class Inky extends Player {
-    private static final double SPEED = 1.5;
+    private static final double SPEED = 1.75;
     private static final double SIZE = 1.5;
 
     /**
