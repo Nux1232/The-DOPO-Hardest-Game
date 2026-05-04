@@ -2,6 +2,9 @@ package main.Entities;
 
 import main.Entities.Strategy.MovementStrategy;
 
+import java.awt.*;
+import java.util.List;
+
 /**
  * Clase que representa a un enemigo del juego.
  *
@@ -28,9 +31,9 @@ public class Enemy {
     /**
      * Método que actualiza el movimiento del enemigo.
      */
-    public void update() {
+    public void update(List<Rectangle> walls) {
         if (movementStrategy != null) {
-            movementStrategy.move(this);
+            movementStrategy.move(this, walls);
         }
     } // Cierre del método
 

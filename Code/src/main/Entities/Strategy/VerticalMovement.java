@@ -2,6 +2,9 @@ package main.Entities.Strategy;
 
 import main.Entities.Enemy;
 
+import java.awt.*;
+import java.util.List;
+
 /**
  * Clase que implementa el movimiento de forma vertical.
  *
@@ -30,10 +33,22 @@ public class VerticalMovement implements MovementStrategy {
      * @param enemy El enemigo que aplica el movimiento.
      */
     @Override
-    public void move(Enemy enemy) {
+    public void move(Enemy enemy, List<Rectangle> walls) {
         enemy.setY(enemy.getY() + (speed * direction));
-        if (enemy.getY() > 580 || enemy.getY() < 0) {
-            direction *= -1;
-        }
+            double newPositionX = enemy.getX();
+            double newPositionY = enemy.getY();
+
+            newPositionY += direction;
+
+
+            Rectangle nextPosition = new Rectangle((int)newPositionX, (int)newPositionY, 15, 15);
+            boolean wallColide = walls.stream().anyMatch(wall -> wall.intersects(nextPosition));
+
+            if(wallColide) {
+                direction *= -1;
+            } else {
+                enemy.setX(newPositionX);
+                enemy.setY(newPositionY);
+            }
     } // Cierre del método
 } // Cierre de la clase

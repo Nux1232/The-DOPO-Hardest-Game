@@ -2,6 +2,9 @@ package main.Entities.Strategy;
 
 import main.Entities.Enemy;
 
+import java.awt.*;
+import java.util.List;
+
 /**
  * Clase que implementa el movimiento circular de un enemigo.
  *
@@ -32,7 +35,7 @@ public class CircularMovement implements MovementStrategy {
      * @param enemy El enemigo que aplica el movimiento.
      */
     @Override
-    public void move(Enemy enemy) {
+    public void move(Enemy enemy, List<Rectangle> walls) {
         angle += speed;
         enemy.setX(centerX + Math.cos(angle) * radius);
         enemy.setY(centerY + Math.sin(angle) * radius);

@@ -22,8 +22,5 @@ public class TimerDisplay implements GameObserver {
         int time = engine.getRemainingTime();
         int minutes = time / 60;
         int seconds = time % 60;
-        
-        // En una UI real, actualizaría un componente visual del cronómetro
-        // System.out.printf("Tiempo restante: %02d:%02d\n", minutes, seconds);
     } // Cierre del método
 } // Cierre de la clase

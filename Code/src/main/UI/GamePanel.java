@@ -164,6 +164,9 @@ public class GamePanel extends JPanel implements GameObserver {
         String coinsText = "Monedas: " + engine.getCollectedCoinsCount() + "/" + engine.getTotalCoinsCount();
         String timeText = String.format("Tiempo: %02d:%02d", minutes, seconds);
         String deathsText = "Muertes: " + deaths;
+        if(minutes == 0 && seconds == 0) {
+            g2.drawString("Fin", 12, 12);
+        }
 
         g2.setFont(new Font("Arial", Font.BOLD, 16));
         FontMetrics metrics = g2.getFontMetrics();

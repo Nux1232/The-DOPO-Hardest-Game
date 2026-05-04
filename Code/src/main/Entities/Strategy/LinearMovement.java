@@ -1,6 +1,8 @@
 package main.Entities.Strategy;
 
 import main.Entities.Enemy;
+import java.awt.Rectangle;
+import java.util.List;
 
 /**
  * Clase que implementa el movimiento lineal de los enemigos.
@@ -14,22 +16,16 @@ public class LinearMovement implements MovementStrategy {
     private double speed;
     private boolean horizontal;
     private int direction = 1;
-    private double minBound;
-    private double maxBound;
 
     /**
      * Constructor de la clase LinearMovement.
      *
      * @param speed La velocidad del movimiento.
      * @param horizontal Indica si el movimiento es horizontal.
-     * @param minBound El limite minimo del movimiento.
-     * @param maxBound El limite maximo del movimiento.
      */
-    public LinearMovement(double speed, boolean horizontal, double minBound, double maxBound) {
+    public LinearMovement(double speed, boolean horizontal) {
         this.speed = speed;
         this.horizontal = horizontal;
-        this.minBound = minBound;
-        this.maxBound = maxBound;
     } // Cierre del constructor
 
     /**
@@ -38,17 +34,24 @@ public class LinearMovement implements MovementStrategy {
      * @param enemy El enemigo que aplica el movimiento.
      */
     @Override
-    public void move(Enemy enemy) {
+    public void move(Enemy enemy, List<Rectangle> walls) {
+        double newPositionX = enemy.getX();
+        double newPositionY = enemy.getY();
+
         if (horizontal) {
-            enemy.setX(enemy.getX() + (speed * direction));
-            if (enemy.getX() > maxBound || enemy.getX() < minBound) {
-                direction *= -1;
-            }
+            newPositionX += speed * direction;
         } else {
-            enemy.setY(enemy.getY() + (speed * direction));
-            if (enemy.getY() > maxBound || enemy.getY() < minBound) {
-                direction *= -1;
-            }
+            newPositionY += speed * direction;
+        }
+
+        Rectangle nextPosition = new Rectangle((int)newPositionX, (int)newPositionY, 15, 15);
+        boolean wallColide = walls.stream().anyMatch(wall -> wall.intersects(nextPosition));
+
+        if(wallColide) {
+            direction *= -1;
+        } else {
+            enemy.setX(newPositionX);
+            enemy.setY(newPositionY);
         }
     } // Cierre del método
 } // Cierre de la clase

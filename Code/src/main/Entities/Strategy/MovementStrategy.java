@@ -1,6 +1,8 @@
 package main.Entities.Strategy;
 
 import main.Entities.Enemy;
+import java.awt.Rectangle;
+import java.util.List;
 
 /**
  * La interfaz que representa una estrategia de movimiento usando el patron de diseño Strategy.
@@ -11,5 +13,5 @@ import main.Entities.Enemy;
  */
 
 public interface MovementStrategy {
-    void move(Enemy enemy);
+    void move(Enemy enemy, List<Rectangle> walls);
 } // Cierre de la interfaz

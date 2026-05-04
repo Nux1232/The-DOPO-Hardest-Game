@@ -67,7 +67,7 @@ public class LevelSelectionState implements MenuScreenState {
     }
 
     private File[] findLevelFiles() {
-        File resources = new File("src/resources");
+        File resources = new File("resources");
         FilenameFilter txtFilter = (dir, name) -> name.toLowerCase().endsWith(".txt");
         File[] files = resources.listFiles(txtFilter);
         return files == null ? new File[0] : files;

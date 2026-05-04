@@ -23,7 +23,7 @@ public class EnemyFactory {
         
         switch (type.toUpperCase()) {
             case "RAPIDO":
-                enemy.setMovementStrategy(new LinearMovement(3.0, true, x - RANGE_MOVEMENT, x + RANGE_MOVEMENT));
+                enemy.setMovementStrategy(new LinearMovement(3.0, true));
                 break;
             case "PATRULLERO":
                 enemy.setMovementStrategy(new CircularMovement(x, y));
@@ -33,7 +33,7 @@ public class EnemyFactory {
                 break;
             case "BASICO":
             default:
-                enemy.setMovementStrategy(new LinearMovement(1.5, true, x - RANGE_MOVEMENT, x + RANGE_MOVEMENT));
+                enemy.setMovementStrategy(new LinearMovement(1.5, true));
                 break;
         }
         return enemy;

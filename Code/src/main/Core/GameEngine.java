@@ -137,7 +137,8 @@ public class GameEngine implements Runnable {
         if (currentState != GameState.PLAYING || currentLevel == null) return;
 
         for(Player p: players) p.update();
-        for (Enemy e : currentLevel.getEnemies()) e.update();
+        List<Rectangle> walls = currentLevel.getWalls();
+        for (Enemy e : currentLevel.getEnemies()) e.update(walls);
         checkCollisions();
         checkCoinCollection();
         checkLevelCompletion();
@@ -145,8 +146,8 @@ public class GameEngine implements Runnable {
 
     /**
      * Método que permite mover al jugador a una direccion deseada.
-     * @param p
-     * @param direction
+     * @param p El jugador.
+     * @param direction La direccion donde quiere ir.
      */
     public void movePlayer(Player p, String direction) {
         double newX = p.getX();
