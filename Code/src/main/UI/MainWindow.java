@@ -110,6 +110,7 @@ public class MainWindow extends JFrame implements MenuContext {
 
         GameEngine engine = GameEngine.getInstance();
         engine.getPlayers().clear();
+        engine.setGameMode(menuData.getSelectedMode());
         Player player = PlayerFactory.createPlayer("Jugador 1", menuData.getSelectedSkin());
         player.setBorderColor(menuData.getSelectedBorderColor());
         engine.getPlayers().add(player);
@@ -141,7 +142,7 @@ public class MainWindow extends JFrame implements MenuContext {
 
     private File findNextLevelFile() {
         File currentFile = menuData.getSelectedLevelFile();
-        File resources = new File("src/resources");
+        File resources = new File("resources");
         File[] files = resources.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
         if (currentFile == null || files == null || files.length == 0) {
             return null;

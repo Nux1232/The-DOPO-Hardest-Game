@@ -3,10 +3,14 @@ package main.Core;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import main.Entities.Factory.GameModeFactory;
 import main.Entities.Player;
 import main.Entities.Enemy;
 import main.Entities.Coin;
 import main.Level.Level;
+import main.Entities.Factory.GameModeFactory;
+import main.Entities.Strategy.GameModeStrategy;
 import main.UI.Observer.GameObserver;
 import java.awt.geom.Rectangle2D;
 
@@ -29,6 +33,7 @@ public class GameEngine implements Runnable {
     private Level currentLevel;
     private List<Player> players = new ArrayList<>();
     private List<GameObserver> observers = new ArrayList<>();
+    private GameModeStrategy gameMode = GameModeFactory.createGameMode("Player");
     private int remainingTime = 180;
     private long lastSecondTime;
 
@@ -56,6 +61,10 @@ public class GameEngine implements Runnable {
      */
     public void addObserver(GameObserver observer) {
         observers.add(observer);
+    } // Cierre del método
+
+    public void setGameMode(String mode) {
+        this.gameMode = GameModeFactory.createGameMode(mode);
     } // Cierre del método
 
     /**
@@ -199,6 +208,23 @@ public class GameEngine implements Runnable {
         }
     } // Cierre del método
 
+    private void checkPlayersCollisions() {
+        for(int i = 0; i < players.size(); i++) {
+            for(int j = i + 1; j < players.size(); j++) {
+                Player firstPlayer = players.get(i);
+                Player secondPlayer = players.get(j);
+                Rectangle2D.Double firstRectangle = new Rectangle2D.Double(firstPlayer.getX(), firstPlayer.getY(),
+                        20 * firstPlayer.getSizeMultiplier(), 20 * firstPlayer.getSizeMultiplier());
+                Rectangle2D.Double secondRectangle = new Rectangle2D.Double(secondPlayer.getX(), secondPlayer.getY(),
+                        20 * secondPlayer.getSizeMultiplier(), 20 * secondPlayer.getSizeMultiplier());
+                if(firstRectangle.intersects(secondRectangle)) {
+                    firstPlayer.handleHit();
+                    secondPlayer.handleHit();
+                }
+            }
+        }
+    } // Cierre del método
+
     /**
      * Método privado que verifica si el jugador obtuvo una moneda.
      */
@@ -229,16 +255,25 @@ public class GameEngine implements Runnable {
     private void checkLevelCompletion() {
         Point finalSafeZone = currentLevel.getFinalSafeZone();
         if (finalSafeZone == null) return;
+        if(getCollectedCoinsCount() < getTotalCoinsCount()) return;
 
         Rectangle finalZoneRect = new Rectangle(finalSafeZone.x, finalSafeZone.y, 60, 60);
-        for (Player p : players) {
+        List<Player> totalPlayers = gameMode.getPlayers();
+        for (Player p : totalPlayers) {
             Rectangle2D.Double pRect = new Rectangle2D.Double(p.getX(), p.getY(),
                     20 * p.getSizeMultiplier(), 20 * p.getSizeMultiplier());
             if (pRect.intersects(finalZoneRect)) {
-                currentState = GameState.VICTORY;
+                if(gameMode.checkWinCondition(totalPlayers,
+                        getCollectedCoinsCount(), getTotalCoinsCount())) {
+                    currentState = GameState.VICTORY;
+                }
                 return;
             }
         }
+    } // Cierre del método
+
+    public Player getWinner() {
+        return gameMode.getWinner(players);
     } // Cierre del método
 
     /**
@@ -257,8 +292,15 @@ public class GameEngine implements Runnable {
         this.currentLevel = level;
         this.currentState = GameState.PLAYING;
         this.remainingTime = level.getTimeLimit();
-        for (Player p : players) {
-            if (level.getStartPoint() != null) {
+        for (int i = 0; i < players.size(); i++) {
+            Player p = players.get(i);
+            Point spawnPoint;
+            if (i == 1 && level.getFinalSafeZone() != null) {
+                spawnPoint = level.getFinalSafeZone();
+            } else {
+                spawnPoint = level.getStartPoint();
+            }
+            if(spawnPoint != null) {
                 p.setRespawnPoint(level.getStartPoint().getX(), level.getStartPoint().getY());
                 p.resetPosition(level.getStartPoint().getX(), level.getStartPoint().getY());
             }
