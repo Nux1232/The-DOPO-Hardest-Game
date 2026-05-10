@@ -5,7 +5,7 @@ package domain.entities;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 02/05/2026
+ * @version 09/05/2026
  */
 
 public class Clyde extends Player {
@@ -38,7 +38,6 @@ public class Clyde extends Player {
             currentSpeed = baseSpeed * 0.7;
             isInvincible = true;
             invincibilityTimer = INVINCIBILITY_FRAMES;
-            System.out.println("¡Escudo roto! Velocidad reducida.");
         } else {
             die();
         }

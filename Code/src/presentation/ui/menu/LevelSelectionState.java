@@ -7,19 +7,34 @@ import java.io.FilenameFilter;
 
 /**
  * Pantalla de selección de archivo de configuración del nivel.
+ *
+ * @author Juan Pablo Cuervo Contreras
+ * @author David Felipe Ortiz Salcedo
+ * @version 09/05/2026
  */
 public class LevelSelectionState implements MenuScreenState {
     public static final String NAME = "levelSelection";
 
+    /**
+     * Método que devuelve el nombre del estado.
+     *
+     * @return String El nombre del estado.
+     */
     @Override
     public String getName() {
         return NAME;
-    }
+    } // Cierre del método
 
+    /**
+     * Método que construye el panel de la pantalla.
+     *
+     * @param context La interfaz de contexto del menú.
+     * @return JPanel El panel de la pantalla.
+     */
     @Override
     public JPanel buildPanel(MenuContext context) {
         JPanel panel = MenuStyles.basePanel();
-        JLabel title = MenuStyles.title("Selecciona Nivel");
+        JLabel title = MenuStyles.title("Selección del Nivel");
         DefaultListModel<File> model = new DefaultListModel<>();
         for (File file : findLevelFiles()) {
             model.addElement(file);
@@ -49,7 +64,7 @@ public class LevelSelectionState implements MenuScreenState {
         scrollPane.setPreferredSize(new Dimension(430, 220));
         scrollPane.setMaximumSize(new Dimension(430, 220));
 
-        JButton playButton = MenuStyles.primaryButton("¡JUGAR!");
+        JButton playButton = MenuStyles.primaryButton("Jugar");
         JButton backButton = MenuStyles.secondaryButton("Volver atrás");
         playButton.addActionListener(event -> context.startSelectedGame());
         backButton.addActionListener(event -> context.changeState(new PlayerCustomizationState()));
@@ -64,12 +79,17 @@ public class LevelSelectionState implements MenuScreenState {
         panel.add(backButton);
         panel.add(Box.createVerticalGlue());
         return panel;
-    }
+    } // Cierre del método
 
+    /**
+     * Método privado que busca los archivos de los niveles
+     * .
+     * @return File[] Los archivos de los niveles.
+     */
     private File[] findLevelFiles() {
         File resources = new File("src/resources");
         FilenameFilter txtFilter = (dir, name) -> name.toLowerCase().endsWith(".txt");
         File[] files = resources.listFiles(txtFilter);
         return files == null ? new File[0] : files;
-    }
-}
+    } // Cierre del método
+} // Cierre de la clase

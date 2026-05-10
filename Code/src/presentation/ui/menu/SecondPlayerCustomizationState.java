@@ -5,13 +5,13 @@ import javax.swing.border.LineBorder;
 import java.awt.*;
 
 /**
- * Pantalla de personalización del primer jugador.
+ * Pantalla de personalización del segundo jugador.
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
  * @version 09/05/2026
  */
-public class PlayerCustomizationState implements MenuScreenState {
+public class SecondPlayerCustomizationState implements MenuScreenState {
     public static final String NAME = "playerCustomization";
 
     /**
@@ -22,7 +22,7 @@ public class PlayerCustomizationState implements MenuScreenState {
     @Override
     public String getName() {
         return NAME;
-    }
+    } // Cierre del método
 
     /**
      * Método que construye el panel de la pantalla.
@@ -33,7 +33,7 @@ public class PlayerCustomizationState implements MenuScreenState {
     @Override
     public JPanel buildPanel(MenuContext context) {
         JPanel panel = MenuStyles.basePanel();
-        JLabel title = MenuStyles.title("Jugador 1");
+        JLabel title = MenuStyles.title("Jugador 2");
         JLabel skinLabel = MenuStyles.sectionLabel("Skin");
         JPanel skins = new JPanel(new GridLayout(1, 3, 12, 0));
         skins.setOpaque(false);
@@ -46,11 +46,7 @@ public class PlayerCustomizationState implements MenuScreenState {
         skinGroup.add(inky);
         skinGroup.add(clyde);
         blinky.setSelected(true);
-        blinky.addActionListener(event -> context.getMenuData().setSelectedSkin("BLINKY"));
-        inky.setSelected(true);
-        inky.addActionListener(event -> context.getMenuData().setSelectedSkin("INKY"));
-        clyde.setSelected(true);
-        clyde.addActionListener(event -> context.getMenuData().setSelectedSkin("CLYDE"));
+        blinky.addActionListener(event -> context.getMenuData().setSecondSelectedSkin("BLINKY"));
 
         skins.add(blinky);
         skins.add(inky);
@@ -67,15 +63,8 @@ public class PlayerCustomizationState implements MenuScreenState {
 
         JButton nextButton = MenuStyles.primaryButton("Siguiente");
         JButton backButton = MenuStyles.secondaryButton("Volver atrás");
-        nextButton.addActionListener(event -> {
-                String gameMode = context.getMenuData().getSelectedMode();
-                if(gameMode.equals("Player vs Player")) {
-                    context.changeState(new SecondPlayerCustomizationState());
-                } else {
-                    context.changeState(new LevelSelectionState());
-                }
-        });
-        backButton.addActionListener(event -> context.changeState(new ModeSelectionState()));
+        nextButton.addActionListener(event -> context.changeState(new LevelSelectionState()));
+        backButton.addActionListener(event -> context.changeState(new PlayerCustomizationState()));
 
         panel.add(Box.createVerticalGlue());
         panel.add(title);
@@ -93,16 +82,8 @@ public class PlayerCustomizationState implements MenuScreenState {
         panel.add(backButton);
         panel.add(Box.createVerticalGlue());
         return panel;
-    } // Cierre del método
+    }
 
-    /**
-     * Método privado que modela los botones de las skins.
-     *
-     * @param text El texto a mostrar.
-     * @param color El color a elegir.
-     * @param enabled Si el botón está habilitado o no.
-     * @return JToggleButton El botón a habilitar.
-     */
     private JToggleButton skinButton(String text, Color color, boolean enabled) {
         JToggleButton button = new JToggleButton(text);
         button.setPreferredSize(new Dimension(190, 72));
@@ -132,7 +113,7 @@ public class PlayerCustomizationState implements MenuScreenState {
         button.setFocusPainted(false);
         button.setBorder(new LineBorder(Color.DARK_GRAY, 2));
         button.setSelected(selected);
-        button.addActionListener(event -> context.getMenuData().setSelectedBorderColor(color));
+        button.addActionListener(event -> context.getMenuData().setSelectedSecondBorderColor(color));
         group.add(button);
         panel.add(button);
     } // Cierre del método

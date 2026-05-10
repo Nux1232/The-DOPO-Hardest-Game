@@ -9,7 +9,7 @@ import java.util.Set;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 02/05/2026
+ * @version 09/05/2026
  */
 
 public abstract class Player {
@@ -71,6 +71,18 @@ public abstract class Player {
             case "RIGHT":
                 x += s;
                 break;
+            case "W":
+                y -= s;
+                break;
+            case "S":
+                y += s;
+                break;
+            case "A":
+                x -= s;
+                break;
+            case "D":
+                x += s;
+                break;
         }
     } // Cierre del método
 
@@ -125,7 +137,6 @@ public abstract class Player {
         resetToOriginal();
         this.x = respawnX;
         this.y = respawnY;
-        System.out.println("Muerte registrada. Reapareciendo...");
     } // Cierre del método
 
     /**
@@ -163,32 +174,40 @@ public abstract class Player {
     } // Cierre del método
 
     /**
+     * Método que permite al jugador obtener una moneda.
      *
+     * @param coinIndex La posicion de la moneda en el nivel.
      */
     public void collectCoin(int coinIndex) {
         collectedCoinIndex.add(coinIndex);
     } // Cierre del método
 
     /**
+     * Método que permite saber si el jugador ha recogido una moneda.
      *
+     * @param coinIndex La posicion de la moneda en el nivel.
      */
     public boolean hasCollectedCoin(int coinIndex) {
         return collectedCoinIndex.contains(coinIndex);
-    }
+    } // Cierre del método
 
     /**
+     * Método que verifica si el jugador recogio todas las monedas.
      *
+     * @param totalCoins La cantidad de monedas totales que obtuvo.
      */
     public boolean hasCollectedAllCoins(int totalCoins) {
         return collectedCoinIndex.size() >= totalCoins;
-    }
+    } // Cierre del método
 
     /**
+     * Método que devuelve la cantidad de monedas recogidas por el jugador.
      *
+     * @return int La cantidad de monedas recogidas por el jugador.
      */
     public int getCollectedCoins() {
         return collectedCoinIndex.size();
-    }
+    } // Cierre del método
 
     public void resetCoins() {
         this.collectedCoinIndex.clear();

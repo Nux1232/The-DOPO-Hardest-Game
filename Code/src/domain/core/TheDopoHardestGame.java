@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * La clase principal del juego: The DOPO Hardest Game.
+ * La clase principal del juego en la capa de dominio.
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 07/05/2026
+ * @version 09/05/2026
  */
 
 public class TheDopoHardestGame {
@@ -39,48 +39,97 @@ public class TheDopoHardestGame {
     } // Cierre del constructor
 
     public void startGame(GameConfiguration configuration) {
+        engine.stopGame();
         Level level = configuration.buildLevel(currentConfigurationIndex + 1);
         engine.loadLevel(level);
         engine.startGame();
     } // Cierre del método
 
+    /**
+     * Método que permite pausar el juego.
+     */
     public void pauseGame() {
         engine.pauseGame();
     } // Cierre del método
 
+    /**
+     * Método que permite reanudar el juego.
+     */
     public void resumeGame() {
         engine.resumeGame();
     } // Cierre del método
 
-    public void endGame() {
-        engine.stopGame();
-        engine.returnToMenu();
-    } // Cierre del método
-
-    public void nextLevel(GameConfiguration nextConfiguration) {
-        currentConfigurationIndex++;
-        engine.getPlayers().forEach(Player::resetCoins);
-        startGame(nextConfiguration);
-    } // Cierre del método
-
-    public void addPlayer(Player player) {
-        engine.getPlayers().add(player);
-    } // Cierre del método
-
-    public void movePlayer(Player player, String direction) {
-        engine.movePlayer(player, direction);
-    } // Cierre del método
-
-    public void setGameMode(String mode) {
-        engine.setGameMode(mode);
-    } // Cierre del método
-
+    /**
+     * Método que permite guardar el estado del juego.
+     *
+     * @param currentLevel El nivel actual que se esta jugando.
+     */
     public void saveGame(File currentLevel) {
         engine.setCurrentLevelFile(currentLevel);
         GameMemento memento = engine.createMemento();
         caretaker.saveMemento(memento);
     } // Cierre del método
 
+    /**
+     * Método que permite finalizar el juego.
+     */
+    public void endGame() {
+        engine.stopGame();
+        engine.returnToMenu();
+    } // Cierre del método
+
+    /**
+     * Método que permite ir al siguiente nivel.
+     *
+     * @param nextConfiguration El siguiente nivel que se va a jugar.
+     */
+    public void nextLevel(GameConfiguration nextConfiguration) {
+        currentConfigurationIndex++;
+        engine.getPlayers().forEach(Player::resetCoins);
+        startGame(nextConfiguration);
+    } // Cierre del método
+
+    /**
+     * Método que permite añadir un jugador al juego.
+     *
+     * @param player El jugador a añadir.
+     */
+    public void addPlayer(Player player) {
+        engine.getPlayers().add(player);
+    } // Cierre del método
+
+    /**
+     * Método que permite mover un jugador a cualquier dirección.
+     *
+     * @param player El jugador que se va a mover.
+     * @param direction La dirección donde quiere ir.
+     */
+    public void movePlayer(Player player, String direction) {
+        engine.movePlayer(player, direction);
+    } // Cierre del método
+
+    /**
+     * Método que permite eliminar todos los jugadores del juego.
+     */
+    public void clearPlayers() {
+        engine.getPlayers().clear();
+    } // Cierre del método
+
+    /**
+     * Método que permite cambiar el modo del juego.
+     *
+     * @param mode El modo que se va a cambiar: SinglePlayer y PlayerVsPlayer por el momento.
+     */
+    public void setGameMode(String mode) {
+        engine.setGameMode(mode);
+    } // Cierre del método
+
+    /**
+     * Método que permite cargar un nivel guardado.
+     *
+     * @param configuration El nivel que se va a jugar.
+     * @throws Exception La excepción que se lanza por si no se encuentra el archivo.
+     */
     public void loadLevel(File configuration) throws Exception {
         GameMemento memento = caretaker.load(configuration);
         if(memento != null) {
@@ -88,47 +137,95 @@ public class TheDopoHardestGame {
         }
     } // Cierre del método
 
+    /**
+     * Método que permite añadir un observador al juego.
+     *
+     * @param observer El observador que sólo verá el juego.
+     */
     public void addObserver(GameObserver observer) {
         engine.addObserver(observer);
     } // Cierre del método
 
-    public List<Player> getPlayers() {
-        return engine.getPlayers();
-    } // Cierre del método
-
-    public Level getCurrentLevel() {
-        return engine.getCurrentLevel();
-    } // Cierre del método
-
-    public int getRemainingTime() {
-        return engine.getRemainingTime();
-    } // Cierre del método
-
-    public GameState getGameState() {
-        return engine.getCurrentState();
-    } // Cierre del método
-
+    /**
+     * Método que verifica si el juego está pausado.
+     *
+     * @return boolean Rectifica si está en pausa o no.
+     */
     public boolean isGamePaused() {
         return engine.getCurrentState() == GameState.PAUSED;
     } // Cierre del método
 
+    /**
+     * Método que verifica si el juego ha terminado.
+     *
+     * @return boolean Rectifica si ha terminado o no.
+     */
     public boolean isGameWon() {
         return engine.getCurrentState() == GameState.VICTORY;
     } // Cierre del método
 
+    /**
+     * Método que obtiene la cantidad de jugadores.
+     *
+     * @return List<Player> La lista de jugadores en el juego.
+     */
+    public List<Player> getPlayers() {
+        return engine.getPlayers();
+    } // Cierre del método
+
+    /**
+     * Método que obtiene el nivel actual.
+     *
+     * @return Level El nivel actual.
+     */
+    public Level getCurrentLevel() {
+        return engine.getCurrentLevel();
+    } // Cierre del método
+
+    /**
+     * Método que obtiene el tiempo restante del nivel.
+     *
+     * @return int El tiempo restante del nivel (180s).
+     */
+    public int getRemainingTime() {
+        return engine.getRemainingTime();
+    } // Cierre del método
+
+    /**
+     * Método que obtiene el estado del juego.
+     *
+     * @return GameState El estado del juego.
+     */
+    public GameState getGameState() {
+        return engine.getCurrentState();
+    } // Cierre del método
+
+    /**
+     * Método que obtiene la cantidad de monedas
+     * recogidas por el jugador.
+     *
+     * @return int La cantidad de monedas obtenidas por el jugador.
+     */
     public int getCollectedCoins() {
         return engine.getCollectedCoinsCount();
     } // Cierre del método
 
+    /**
+     * Método que obtiene la cantidad total de monedas.
+     *
+     * @return int La cantidad total de monedas.
+     */
     public int getTotalCoins() {
         return engine.getTotalCoinsCount();
     } // Cierre del método
 
+    /**
+     * Método que obtiene el ganador del juego.
+     *
+     * @return Player El ganador del juego.
+     */
     public Player getWinner() {
         return engine.getWinner();
     } // Cierre del método
 
-    public void clearPlayers() {
-        engine.getPlayers().clear();
-    }
 } // Cierre de la clase

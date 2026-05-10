@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
+import java.security.Key;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ import java.util.Set;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 01/05/2026
+ * @version 09/05/2026
  */
 
 public class GamePanel extends JPanel implements GameObserver {
@@ -54,25 +55,47 @@ public class GamePanel extends JPanel implements GameObserver {
         });
     } // Cierre del constructor
 
+    /**
+     * Método que establece la pausa del juego.
+     *
+     * @param pauseAction La accion para pausar el juego.
+     */
     public void setPauseAction(Runnable pauseAction) {
         this.pauseAction = pauseAction;
-    }
+    } // Cierre del método
 
+    /**
+     * Método que limpia las teclas presionadas.
+     */
     public void clearPressedKeys() {
         pressedKeys.clear();
-    }
+    } // Cierre del método
 
     /**
      * Método privado que maneja el movimiento del jugador.
      */
     private void handleInput() {
         if (game.getPlayers().isEmpty()) return;
+        keysLogic();
+    } // Cierre del método
+
+    /**
+     * Método privado que maneja el movimiento del jugador.
+     */
+    private void keysLogic() {
         Player p = game.getPlayers().get(0);
-        GameEngine engine = GameEngine.getInstance();
-        if (pressedKeys.contains(KeyEvent.VK_UP)) game.movePlayer(p, "UP");
-        if (pressedKeys.contains(KeyEvent.VK_DOWN)) game.movePlayer(p, "DOWN");
-        if (pressedKeys.contains(KeyEvent.VK_LEFT)) game.movePlayer(p, "LEFT");
+        if (pressedKeys.contains(KeyEvent.VK_UP))    game.movePlayer(p, "UP");
+        if (pressedKeys.contains(KeyEvent.VK_DOWN))  game.movePlayer(p, "DOWN");
+        if (pressedKeys.contains(KeyEvent.VK_LEFT))  game.movePlayer(p, "LEFT");
         if (pressedKeys.contains(KeyEvent.VK_RIGHT)) game.movePlayer(p, "RIGHT");
+
+        if (game.getPlayers().size() > 1) {
+            Player p2 = game.getPlayers().get(1);
+            if (pressedKeys.contains(KeyEvent.VK_W)) game.movePlayer(p2, "UP");
+            if (pressedKeys.contains(KeyEvent.VK_S)) game.movePlayer(p2, "DOWN");
+            if (pressedKeys.contains(KeyEvent.VK_A)) game.movePlayer(p2, "LEFT");
+            if (pressedKeys.contains(KeyEvent.VK_D)) game.movePlayer(p2, "RIGHT");
+        }
     } // Cierre del método
 
     /**
@@ -113,8 +136,17 @@ public class GamePanel extends JPanel implements GameObserver {
 
         // Moneda
         if (game.getCurrentLevel() != null) {
-            for (Coin c :game.getCurrentLevel().getCoins()) {
-                if (!c.isCollected()) {
+            for (Coin c : level.getCoins()) {
+                boolean coinCollected;
+                if(game.getPlayers().size() > 1) {
+                    int coinIndex = level.getCoins().indexOf(c);
+                    coinCollected = game.getPlayers().stream()
+                            .allMatch(p -> p.hasCollectedCoin(coinIndex));
+                } else {
+                    coinCollected = c.isCollected();
+                }
+
+                if (!coinCollected) {
                     g2.setColor(parseCoinColor(c.getType()));
                     g2.fillOval((int)c.getX() - radius/2, (int)c.getY() - radius/2, radius, radius);
                     g2.setColor(Color.BLACK);
@@ -146,6 +178,11 @@ public class GamePanel extends JPanel implements GameObserver {
         g2.dispose();
     } // Cierre del método
 
+    /**
+     * Método privado que transforma el mundo para que se ajuste al panel.
+     *
+     * @param g2 Dibuja el mundo.
+     */
     private void applyWorldTransform(Graphics2D g2) {
         double scaleX = getWidth() / (double) WORLD_WIDTH;
         double scaleY = getHeight() / (double) WORLD_HEIGHT;
@@ -157,37 +194,69 @@ public class GamePanel extends JPanel implements GameObserver {
         g2.scale(scale, scale);
     } // Cierre del método
 
+    /**
+     * Método privado que dibuja la información de un jugador.
+     *
+     * @param g2 Dibuja la información del jugador.
+     */
     private void drawHud(Graphics2D g2) {
         int time = game.getRemainingTime();
         int minutes = time / 60;
         int seconds = time % 60;
         int deaths = game.getPlayers().isEmpty() ? 0 : game.getPlayers().get(0).getDeaths();
 
-        String coinsText = "Monedas: " + game.getCollectedCoins() + "/" + game.getTotalCoins();
         String timeText = String.format("Tiempo: %02d:%02d", minutes, seconds);
-        String deathsText = "Muertes: " + deaths;
-        if(minutes == 0 && seconds == 0) {
-            g2.drawString("Fin", 12, 12);
+        drawHudBox(g2, new String[]{timeText}, 350, 500);
+
+        if(!game.getPlayers().isEmpty()) {
+            Player firstPlayer = game.getPlayers().get(0);
+            String playerName = "Jugador 1";
+            String coinsFirstPlayerText = "Monedas: " + firstPlayer.getCollectedCoins() + "/" + game.getTotalCoins();
+            String deathsFirstPlayerText = "Muertes: " + firstPlayer.getDeaths();
+            drawHudBox(g2, new String[]{playerName, coinsFirstPlayerText, deathsFirstPlayerText},
+                    -165, 12);
         }
 
+        if(game.getPlayers().size() > 1) {
+            Player secondPlayer = game.getPlayers().get(1);
+            String playerName = "Jugador 2";
+            String coinsSecondPlayerText = "Monedas: " + secondPlayer.getCollectedCoins() + "/" + game.getTotalCoins();
+            String deathsSecondPlayerText = "Muertes: " + secondPlayer.getDeaths();
+            drawHudBox(g2, new String[]{playerName, coinsSecondPlayerText, deathsSecondPlayerText}, 850, 12);
+        }
+    } // Cierre del método
+
+    /**
+     * Método privado que dibuja un cuadro con texto.
+     *
+     * @param g2 Dibuja el cuadro.
+     * @param lines El texto que se quiere escribir.
+     * @param positionX La posición en x del cuadro.
+     * @param positionY La posición en y del cuadro.
+     */
+    private void drawHudBox(Graphics2D g2, String[] lines, int positionX, int positionY) {
         g2.setFont(new Font("Arial", Font.BOLD, 16));
         FontMetrics metrics = g2.getFontMetrics();
         int padding = 10;
         int lineHeight = metrics.getHeight();
-        int boxWidth = Math.max(metrics.stringWidth(coinsText),
-                Math.max(metrics.stringWidth(timeText), metrics.stringWidth(deathsText))) + padding * 2;
+        int boxWidth = 0;
+        for (String line : lines) {
+            boxWidth = Math.max(boxWidth, metrics.stringWidth(line));
+        }
+        boxWidth += padding * 2;
         int boxHeight = lineHeight * 3 + padding * 2;
 
         g2.setColor(new Color(255, 255, 255, 220));
-        g2.fillRoundRect(12, 12, boxWidth, boxHeight, 8, 8);
+        g2.fillRoundRect(positionX, positionY, boxWidth, boxHeight, 8, 8);
         g2.setColor(Color.BLACK);
-        g2.drawRoundRect(12, 12, boxWidth, boxHeight, 8, 8);
+        g2.drawRoundRect(positionX, positionY, boxWidth, boxHeight, 8, 8);
 
-        int textX = 12 + padding;
-        int textY = 12 + padding + metrics.getAscent();
-        g2.drawString(coinsText, textX, textY);
-        g2.drawString(timeText, textX, textY + lineHeight);
-        g2.drawString(deathsText, textX, textY + lineHeight * 2);
+        int textX = positionX + padding;
+        int textY = positionY + padding + metrics.getAscent();
+        for(String line : lines) {
+            g2.drawString(line, textX, textY);
+            textY += lineHeight;
+        }
     } // Cierre del método
 
     /**

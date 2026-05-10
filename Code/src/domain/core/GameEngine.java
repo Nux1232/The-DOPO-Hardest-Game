@@ -80,17 +80,23 @@ public class GameEngine implements Runnable {
         gameThread.start();
     } // Cierre del método
 
+    /**
+     * Método que permite pausar el juego.
+     */
     public void pauseGame() {
         if (currentState == GameState.PLAYING) {
             currentState = GameState.PAUSED;
         }
-    }
+    } // Cierre del método
 
+    /**
+     * Método que permite reanudar el juego.
+     */
     public void resumeGame() {
         if (currentState == GameState.PAUSED) {
             currentState = GameState.PLAYING;
         }
-    }
+    } // Cierre del método
 
     /**
      * Método que pausa el juego donde solo un hilo lo ejecute a la vez.
@@ -99,6 +105,9 @@ public class GameEngine implements Runnable {
         running = false;
     } // Cierre del método
 
+    /**
+     * Método que permite regresar al menu del juego.
+     */
     public synchronized void returnToMenu() {
         running = false;
         currentState = GameState.MENU;
@@ -113,7 +122,7 @@ public class GameEngine implements Runnable {
             }
         }
         gameThread = null;
-    }
+    } // Cierre del método
 
     /**
      * Método que ejecuta el juego.
@@ -152,6 +161,7 @@ public class GameEngine implements Runnable {
         List<Rectangle> walls = currentLevel.getWalls();
         for (Enemy e : currentLevel.getEnemies()) e.update(walls);
         checkCollisions();
+        checkPlayersCollisions();
         checkCoinCollection();
         checkLevelCompletion();
     } // Cierre del método
@@ -172,6 +182,10 @@ public class GameEngine implements Runnable {
             case "DOWN":  newY += speed; break;
             case "LEFT":  newX -= speed; break;
             case "RIGHT": newX += speed; break;
+            case "W": newY -= speed; break;
+            case "S": newY += speed; break;
+            case "A": newX -= speed; break;
+            case "D": newX += speed; break;
         }
         boolean blocked = collidesWithWall(newX, newY, size);
         if (!blocked) {
@@ -293,22 +307,18 @@ public class GameEngine implements Runnable {
     } // Cierre del método
 
     private void checkLevelCompletion() {
-        Point finalSafeZone = currentLevel.getFinalSafeZone();
-        if (finalSafeZone == null) return;
+        gameMode.checkLevelCompletion(players, currentLevel);
 
-        Rectangle finalZoneRect = new Rectangle(finalSafeZone.x, finalSafeZone.y,
-                60, 60);
-        for (Player p : players) {
-            if(!p.hasCollectedAllCoins(getTotalCoinsCount())) continue;
-            Rectangle2D.Double pRect = new Rectangle2D.Double(p.getX(), p.getY(),
-                    20 * p.getSizeMultiplier(), 20 * p.getSizeMultiplier());
-            if (pRect.intersects(finalZoneRect)) {
-                currentState = GameState.VICTORY;
-                return;
-            }
+        if(gameMode.checkWinCondition(players, getCollectedCoinsCount(), getTotalCoinsCount())) {
+            currentState = GameState.VICTORY;
         }
     } // Cierre del método
 
+    /**
+     * Método que obtiene el ganador del juego.
+     *
+     * @return Player El ganador del juego.
+     */
     public Player getWinner() {
         return gameMode.getWinner(players);
     } // Cierre del método
@@ -329,17 +339,15 @@ public class GameEngine implements Runnable {
         this.currentLevel = level;
         this.currentState = GameState.PLAYING;
         this.remainingTime = level.getTimeLimit();
+        gameMode.setUp(players);
+
         for (int i = 0; i < players.size(); i++) {
             Player p = players.get(i);
-            Point spawnPoint;
-            if (i == 1 && level.getFinalSafeZone() != null) {
-                spawnPoint = level.getFinalSafeZone();
-            } else {
-                spawnPoint = level.getStartPoint();
-            }
+            Point spawnPoint = (i == 1 && level.getFinalSafeZone() != null)
+                    ? level.getFinalSafeZone() : level.getStartPoint();
             if(spawnPoint != null) {
-                p.setRespawnPoint(level.getStartPoint().getX(), level.getStartPoint().getY());
-                p.resetPosition(level.getStartPoint().getX(), level.getStartPoint().getY());
+                p.setRespawnPoint(spawnPoint.getX(), spawnPoint.getY());
+                p.resetPosition(spawnPoint.getX(), spawnPoint.getY());
             }
         }
     } // Cierre del método

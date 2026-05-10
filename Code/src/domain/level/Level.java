@@ -11,7 +11,7 @@ import domain.entities.Coin;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 02/05/2026
+ * @version 09/05/2026
  */
 
 public class Level {
@@ -19,7 +19,7 @@ public class Level {
     private int timeLimit;
     private List<Enemy> enemies;
     private List<Coin> coins;
-    private List<Rectangle> walls; // Representación simple de obstáculos
+    private List<Rectangle> walls;
     private Point startPoint;
     private Point intermediateSafeZone;
     private Point finalSafeZone;
@@ -169,6 +169,17 @@ public class Level {
      * @return Point La zona final segura del nivel.
      */
     public Point getFinalSafeZone() {
+        return finalSafeZone;
+    } // Cierre del método
+
+    /**
+     * Método que obtiene la zona final segura de cada jugador (modo pvp).
+     *
+     * @param playerIndex Las posiciones de los jugadores.
+     * @return Point La zona final segura de cada jugador.
+     */
+    public Point getFinalZoneForPlayer(int playerIndex) {
+        if (playerIndex == 1) return startPoint;
         return finalSafeZone;
     } // Cierre del método
 } // Cierre de la clase

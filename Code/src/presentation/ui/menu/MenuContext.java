@@ -1,7 +1,13 @@
 package presentation.ui.menu;
 
+import domain.core.TheDopoHardestGame;
+
 /**
  * Contrato que usan los estados del menú para cambiar de pantalla o iniciar el juego.
+ *
+ * @author Juan Pablo Cuervo Contreras
+ * @author David Felipe Ortiz Salcedo
+ * @version 09/05/2026
  */
 public interface MenuContext {
     MenuData getMenuData();
@@ -11,5 +17,6 @@ public interface MenuContext {
     void loadSavedGame();
     void resumeGame();
     void returnToMainMenu();
+    TheDopoHardestGame getGame();
     void exitGame();
-}
+} // Cierre de la interfaz

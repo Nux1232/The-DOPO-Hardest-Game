@@ -27,7 +27,7 @@ import java.io.File;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 01/05/2026
+ * @version 09/05/2026
  */
 public class MainWindow extends JFrame implements MenuContext {
     private GamePanel gamePanel;
@@ -87,11 +87,21 @@ public class MainWindow extends JFrame implements MenuContext {
         return gamePanel;
     } // Cierre del método
 
+    /**
+     * Método que sobreescribe la obtencion de los datos del menu.
+     *
+     * @return MenuData Los datos del menu.
+     */
     @Override
     public MenuData getMenuData() {
         return menuData;
-    }
+    } // Cierre del método
 
+    /**
+     * Método que cambia el estado del menu.
+     *
+     * @param state El nuevo estado del menu.
+     */
     @Override
     public void changeState(MenuScreenState state) {
         menuPanel.add(state.buildPanel(this), state.getName());
@@ -99,14 +109,18 @@ public class MainWindow extends JFrame implements MenuContext {
         rootLayout.show(rootPanel, "menu");
         revalidate();
         repaint();
-    }
+    } // Cierre del método
 
+    /**
+     * Método que inicia el juego.
+     */
     @Override
     public void startSelectedGame() {
         try{
             File levelFile = menuData.getSelectedLevelFile();
             if (levelFile == null) {
-                JOptionPane.showMessageDialog(this, "No hay un archivo de nivel seleccionado.", "Nivel requerido", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "No hay un archivo de nivel seleccionado.",
+                        "Nivel requerido", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             game.clearPlayers();
@@ -116,10 +130,15 @@ public class MainWindow extends JFrame implements MenuContext {
             player.setBorderColor(menuData.getSelectedBorderColor());
             game.addPlayer(player);
 
+            if(menuData.getSelectedMode().equals("Player vs Player")) {
+                Player secondPlayer = PlayerFactory.createPlayer("Jugador 2", menuData.getSelectedSkin());
+                secondPlayer.setBorderColor(menuData.getSelectedSecondBorderColor());
+                game.addPlayer(secondPlayer);
+            }
+
             GameConfiguration configuration = new GameConfiguration(levelFile.getPath());
             Level level = configuration.buildLevel(1);
             levelCompletedScreenVisible = false;
-            game.loadLevel(levelFile);
             game.startGame(configuration);
 
             rootLayout.show(rootPanel, "game");
@@ -128,8 +147,11 @@ public class MainWindow extends JFrame implements MenuContext {
             JOptionPane.showMessageDialog(this, "Error al iniciar el juego: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
+    } // Cierre del método
 
+    /**
+     * Método que permite ir al siguiente nivel.
+     */
     @Override
     public void startNextLevel() {
         File nextLevelFile = findNextLevelFile();
@@ -143,8 +165,13 @@ public class MainWindow extends JFrame implements MenuContext {
 
         menuData.setSelectedLevelFile(nextLevelFile);
         startSelectedGame();
-    }
+    } // Cierre del método
 
+    /**
+     * Método privado que encuentra el siguiente nivel.
+     *
+     * @return File el siguiente nivel.
+     */
     private File findNextLevelFile() {
         File currentFile = menuData.getSelectedLevelFile();
         File resources = new File("src/resources");
@@ -160,8 +187,11 @@ public class MainWindow extends JFrame implements MenuContext {
             }
         }
         return null;
-    }
+    } // Cierre del método
 
+    /**
+     * Método privado que muestra el pantalla de nivel completado si es necesario.
+     */
     private void showLevelCompletedIfNeeded() {
         if (game.getGameState() != GameState.VICTORY || levelCompletedScreenVisible) {
             return;
@@ -172,8 +202,11 @@ public class MainWindow extends JFrame implements MenuContext {
             gamePanel.clearPressedKeys();
             changeState(new LevelCompletedState());
         });
-    }
+    } // Cierre del método
 
+    /**
+     * Método que enseña el menu de pausa.
+     */
     private void showPauseMenu() {
         if (game.getGameState() != GameState.PLAYING) {
             return;
@@ -182,8 +215,11 @@ public class MainWindow extends JFrame implements MenuContext {
         game.pauseGame();
         gamePanel.clearPressedKeys();
         changeState(new PauseMenuState());
-    }
+    } // Cierre del método
 
+    /**
+     * Método que permite reanudar el juego.
+     */
     @Override
     public void resumeGame() {
         game.resumeGame();
@@ -191,22 +227,31 @@ public class MainWindow extends JFrame implements MenuContext {
         revalidate();
         repaint();
         SwingUtilities.invokeLater(() -> gamePanel.requestFocusInWindow());
-    }
+    } // Cierre del método
 
+    /**
+     * Método que permite regresar al menu principal.
+     */
     @Override
     public void returnToMainMenu() {
         game.endGame();
         gamePanel.clearPressedKeys();
         changeState(new ModeSelectionState());
-    }
+    } // Cierre del método
 
+    /**
+     * Método que permite salir del juego.
+     */
     @Override
     public void exitGame() {
         game.endGame();
         dispose();
         System.exit(0);
-    }
+    } // Cierre del método
 
+    /**
+     * Método que permite cargar el estado de un juego guardado.
+     */
     @Override
     public void loadSavedGame() {
         JFileChooser chooser = new JFileChooser(new File("."));
@@ -226,5 +271,15 @@ public class MainWindow extends JFrame implements MenuContext {
                     "Error de carga",
                     JOptionPane.ERROR_MESSAGE);
         }
-    }
+    } // Cierre del método
+
+    /**
+     * Método que obtiene un juego.
+     *
+     * @return TheDopoHardestGame El juego.
+     */
+    @Override
+    public TheDopoHardestGame getGame() {
+        return game;
+    } // Cierre del método
 } // Cierre de la clase
