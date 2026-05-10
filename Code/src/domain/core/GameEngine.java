@@ -163,6 +163,7 @@ public class GameEngine implements Runnable {
         checkCollisions();
         checkPlayersCollisions();
         checkCoinCollection();
+        checkIntermediateZone();
         checkLevelCompletion();
     } // Cierre del método
 
@@ -311,6 +312,22 @@ public class GameEngine implements Runnable {
 
         if(gameMode.checkWinCondition(players, getCollectedCoinsCount(), getTotalCoinsCount())) {
             currentState = GameState.VICTORY;
+        }
+    } // Cierre del método
+
+    /**
+     * Método privado que verifica que el jugador reaparezca
+     * en la zona intermedia.
+     */
+    private void checkIntermediateZone() {
+        Point intermediateZone = currentLevel.getIntermediateSafeZone();
+        if(intermediateZone == null) return;
+        for(Player player: players) {
+            Rectangle2D.Double pRect = new Rectangle2D.Double(player.getX(), player.getY(),
+                    20 * player.getSizeMultiplier(), 20 * player.getSizeMultiplier());
+            if(pRect.intersects(intermediateZone.x, intermediateZone.y, 60, 60)) {
+                player.setRespawnPoint(intermediateZone.x, intermediateZone.y);
+            }
         }
     } // Cierre del método
 

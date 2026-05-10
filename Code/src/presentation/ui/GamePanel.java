@@ -126,6 +126,13 @@ public class GamePanel extends JPanel implements GameObserver {
             g2.fillRect(startPoint.x, startPoint.y, 60, 60);
         }
 
+        // Punto intermedio
+        Point intermediateZone = game.getCurrentLevel().getIntermediateSafeZone();
+        if(intermediateZone != null) {
+            g2.setColor(new Color(180, 230, 120));
+            g2.fillRect(intermediateZone.x, intermediateZone.y, 60, 60);
+        }
+
         // Punto final
         Point finalZone = game.getCurrentLevel().getFinalSafeZone();
         if(finalZone != null) {
