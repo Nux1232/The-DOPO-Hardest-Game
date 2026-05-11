@@ -3,6 +3,7 @@ package domain.core;
 import domain.entities.Player;
 import domain.entities.factory.GameModeFactory;
 import domain.entities.strategy.GameModeStrategy;
+import domain.exceptions.TheDopoHardestGameException;
 import domain.level.GameConfiguration;
 import domain.level.Level;
 import domain.save.memento.GameCaretaker;
@@ -10,6 +11,7 @@ import domain.save.memento.GameMemento;
 import presentation.ui.observer.GameObserver;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +40,16 @@ public class TheDopoHardestGame {
         this.currentConfigurationIndex = 0;
     } // Cierre del constructor
 
-    public void startGame(GameConfiguration configuration) {
+    public void startGame(GameConfiguration configuration) throws TheDopoHardestGameException {
+        if(engine.getPlayers().isEmpty()) {
+            throw new TheDopoHardestGameException(TheDopoHardestGameException.NO_PLAYERS);
+        }
+
         engine.stopGame();
         Level level = configuration.buildLevel(currentConfigurationIndex + 1);
+        if(level == null) {
+            throw new TheDopoHardestGameException(TheDopoHardestGameException.LEVEL_LOAD_ERROR);
+        }
         engine.loadLevel(level);
         engine.startGame();
     } // Cierre del método
@@ -64,7 +73,10 @@ public class TheDopoHardestGame {
      *
      * @param currentLevel El nivel actual que se esta jugando.
      */
-    public void saveGame(File currentLevel) {
+    public void saveGame(File currentLevel) throws TheDopoHardestGameException {
+        if(currentLevel == null) {
+            throw new TheDopoHardestGameException(TheDopoHardestGameException.SAVE_GAME_ERROR);
+        }
         engine.setCurrentLevelFile(currentLevel);
         GameMemento memento = engine.createMemento();
         caretaker.saveMemento(memento);
@@ -83,7 +95,10 @@ public class TheDopoHardestGame {
      *
      * @param nextConfiguration El siguiente nivel que se va a jugar.
      */
-    public void nextLevel(GameConfiguration nextConfiguration) {
+    public void nextLevel(GameConfiguration nextConfiguration) throws TheDopoHardestGameException {
+        if(nextConfiguration == null) {
+            throw new TheDopoHardestGameException(TheDopoHardestGameException.LOAD_GAME_ERROR);
+        }
         currentConfigurationIndex++;
         engine.getPlayers().forEach(Player::resetCoins);
         startGame(nextConfiguration);
@@ -94,7 +109,10 @@ public class TheDopoHardestGame {
      *
      * @param player El jugador a añadir.
      */
-    public void addPlayer(Player player) {
+    public void addPlayer(Player player) throws TheDopoHardestGameException {
+        if(player == null) {
+            throw new TheDopoHardestGameException(TheDopoHardestGameException.NO_PLAYERS);
+        }
         engine.getPlayers().add(player);
     } // Cierre del método
 
@@ -120,7 +138,10 @@ public class TheDopoHardestGame {
      *
      * @param mode El modo que se va a cambiar: SinglePlayer y PlayerVsPlayer por el momento.
      */
-    public void setGameMode(String mode) {
+    public void setGameMode(String mode) throws TheDopoHardestGameException {
+        if(mode == null) {
+            throw new TheDopoHardestGameException(TheDopoHardestGameException.INVALID_GAMEMODE);
+        }
         engine.setGameMode(mode);
     } // Cierre del método
 
@@ -130,7 +151,11 @@ public class TheDopoHardestGame {
      * @param configuration El nivel que se va a jugar.
      * @throws Exception La excepción que se lanza por si no se encuentra el archivo.
      */
-    public void loadLevel(File configuration) throws Exception {
+    public void loadLevel(File configuration) throws TheDopoHardestGameException, IOException, ClassNotFoundException {
+        if(configuration == null) {
+            throw new TheDopoHardestGameException(TheDopoHardestGameException.LEVEL_LOAD_ERROR);
+        }
+
         GameMemento memento = caretaker.load(configuration);
         if(memento != null) {
             engine.restoreMemento(memento);

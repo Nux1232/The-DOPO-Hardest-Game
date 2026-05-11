@@ -5,6 +5,7 @@ import domain.entities.Enemy;
 import domain.entities.Player;
 import domain.entities.factory.PlayerFactory;
 import domain.entities.strategy.VerticalMovement;
+import domain.exceptions.TheDopoHardestGameException;
 import domain.level.GameConfiguration;
 import domain.level.Level;
 import presentation.ui.GamePanel;
@@ -18,6 +19,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.lang.reflect.Method;
 import java.util.Collections;
+
+/**
+ * Clase que permite realizar pruebas de unidad del juego.
+ *
+ * @author Juan Pablo Cuervo Contreras
+ * @author David Felipe Ortiz Salcedo
+ * @version 10/05/2026
+ */
 
 public class GameEngineTest {
     private static int testsRun = 0;
@@ -207,7 +216,7 @@ public class GameEngineTest {
         assertDoubleEquals(10, enemy.getY(), "enemy should reverse direction after touching a wall");
     }
 
-    private static void hudIsPaintedInsideCurrentPanelSize() {
+    private static void hudIsPaintedInsideCurrentPanelSize() throws TheDopoHardestGameException {
         GameEngine engine = resetEngine();
         TheDopoHardestGame game = new TheDopoHardestGame();
         game.clearPlayers();
@@ -279,4 +288,4 @@ public class GameEngineTest {
     private interface TestCase {
         void run() throws Exception;
     }
-}
+} // Cierre de la clase

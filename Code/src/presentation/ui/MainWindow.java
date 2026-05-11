@@ -5,6 +5,7 @@ import domain.core.GameState;
 import domain.core.TheDopoHardestGame;
 import domain.entities.Player;
 import domain.entities.factory.PlayerFactory;
+import domain.exceptions.TheDopoHardestGameException;
 import domain.level.GameConfiguration;
 import domain.level.Level;
 import domain.save.memento.GameCaretaker;
@@ -21,6 +22,7 @@ import presentation.ui.observer.TimerDisplay;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Clase que contiene la ventana principal del juego.
@@ -146,7 +148,7 @@ public class MainWindow extends JFrame implements MenuContext {
 
             rootLayout.show(rootPanel, "game");
             SwingUtilities.invokeLater(() -> gamePanel.requestFocusInWindow());
-        } catch (Exception e) {
+        } catch (TheDopoHardestGameException e) {
             JOptionPane.showMessageDialog(this, "Error al iniciar el juego: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -311,7 +313,7 @@ public class MainWindow extends JFrame implements MenuContext {
             File selectedFile = chooser.getSelectedFile();
             game.loadLevel(selectedFile);
             startSelectedGame();
-        } catch (Exception exception) {
+        } catch (TheDopoHardestGameException | IOException | ClassNotFoundException exception) {
             JOptionPane.showMessageDialog(this,
                     "No se pudo cargar la partida: " + exception.getMessage(),
                     "Error de carga",
