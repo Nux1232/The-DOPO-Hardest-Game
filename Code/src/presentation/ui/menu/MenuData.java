@@ -47,6 +47,15 @@ public class MenuData {
     } // Cierre del método
 
     /**
+     * Método que obtiene la skin seleccionada por el segundo usuario.
+     *
+     * @return String La skin seleccionada por el segundo usuario.
+     */
+    public String getSecondSelectedSkin() {
+        return secondSelectedSkin;
+    } // Cierre del método
+
+    /**
      * Método que establece la skin seleccionada por el usuario.
      *
      * @param selectedSkin La skin seleccionada por el usuario.

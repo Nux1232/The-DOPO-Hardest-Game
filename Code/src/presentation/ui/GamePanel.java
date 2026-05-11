@@ -181,8 +181,12 @@ public class GamePanel extends JPanel implements GameObserver {
             g2.setStroke(new BasicStroke(1));
         }
 
-        drawHud(g2);
         g2.dispose();
+
+        Graphics2D hudGraphics = (Graphics2D) g.create();
+        hudGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        drawHud(hudGraphics);
+        hudGraphics.dispose();
     } // Cierre del método
 
     /**
@@ -210,10 +214,13 @@ public class GamePanel extends JPanel implements GameObserver {
         int time = game.getRemainingTime();
         int minutes = time / 60;
         int seconds = time % 60;
-        int deaths = game.getPlayers().isEmpty() ? 0 : game.getPlayers().get(0).getDeaths();
+        int margin = Math.max(8, Math.min(getWidth(), getHeight()) / 40);
 
         String timeText = String.format("Tiempo: %02d:%02d", minutes, seconds);
-        drawHudBox(g2, new String[]{timeText}, 350, 500);
+        Dimension timeSize = getHudBoxSize(g2, new String[]{timeText});
+        int timeX = Math.max(margin, (getWidth() - timeSize.width) / 2);
+        int timeY = Math.max(margin, getHeight() - timeSize.height - margin);
+        drawHudBox(g2, new String[]{timeText}, timeX, timeY);
 
         if(!game.getPlayers().isEmpty()) {
             Player firstPlayer = game.getPlayers().get(0);
@@ -221,7 +228,7 @@ public class GamePanel extends JPanel implements GameObserver {
             String coinsFirstPlayerText = "Monedas: " + firstPlayer.getCollectedCoins() + "/" + game.getTotalCoins();
             String deathsFirstPlayerText = "Muertes: " + firstPlayer.getDeaths();
             drawHudBox(g2, new String[]{playerName, coinsFirstPlayerText, deathsFirstPlayerText},
-                    -165, 12);
+                    margin, margin);
         }
 
         if(game.getPlayers().size() > 1) {
@@ -229,8 +236,30 @@ public class GamePanel extends JPanel implements GameObserver {
             String playerName = "Jugador 2";
             String coinsSecondPlayerText = "Monedas: " + secondPlayer.getCollectedCoins() + "/" + game.getTotalCoins();
             String deathsSecondPlayerText = "Muertes: " + secondPlayer.getDeaths();
-            drawHudBox(g2, new String[]{playerName, coinsSecondPlayerText, deathsSecondPlayerText}, 850, 12);
+            String[] secondPlayerLines = new String[]{playerName, coinsSecondPlayerText, deathsSecondPlayerText};
+            Dimension secondPlayerSize = getHudBoxSize(g2, secondPlayerLines);
+            int secondPlayerX = Math.max(margin, getWidth() - secondPlayerSize.width - margin);
+            drawHudBox(g2, secondPlayerLines, secondPlayerX, margin);
         }
+    } // Cierre del método
+
+    /**
+     * Método privado que calcula el tamaño de un cuadro del HUD.
+     *
+     * @param g2 Dibuja el cuadro.
+     * @param lines Las líneas del cuadro.
+     * @return Dimension El tamaño del cuadro.
+     */
+    private Dimension getHudBoxSize(Graphics2D g2, String[] lines) {
+        g2.setFont(new Font("Arial", Font.BOLD, 16));
+        FontMetrics metrics = g2.getFontMetrics();
+        int padding = 10;
+        int lineHeight = metrics.getHeight();
+        int boxWidth = 0;
+        for (String line : lines) {
+            boxWidth = Math.max(boxWidth, metrics.stringWidth(line));
+        }
+        return new Dimension(boxWidth + padding * 2, lineHeight * lines.length + padding * 2);
     } // Cierre del método
 
     /**
@@ -251,15 +280,18 @@ public class GamePanel extends JPanel implements GameObserver {
             boxWidth = Math.max(boxWidth, metrics.stringWidth(line));
         }
         boxWidth += padding * 2;
-        int boxHeight = lineHeight * 3 + padding * 2;
+        int boxHeight = lineHeight * lines.length + padding * 2;
+
+        int safeX = Math.max(0, Math.min(positionX, Math.max(0, getWidth() - boxWidth)));
+        int safeY = Math.max(0, Math.min(positionY, Math.max(0, getHeight() - boxHeight)));
 
         g2.setColor(new Color(255, 255, 255, 220));
-        g2.fillRoundRect(positionX, positionY, boxWidth, boxHeight, 8, 8);
+        g2.fillRoundRect(safeX, safeY, boxWidth, boxHeight, 8, 8);
         g2.setColor(Color.BLACK);
-        g2.drawRoundRect(positionX, positionY, boxWidth, boxHeight, 8, 8);
+        g2.drawRoundRect(safeX, safeY, boxWidth, boxHeight, 8, 8);
 
-        int textX = positionX + padding;
-        int textY = positionY + padding + metrics.getAscent();
+        int textX = safeX + padding;
+        int textY = safeY + padding + metrics.getAscent();
         for(String line : lines) {
             g2.drawString(line, textX, textY);
             textY += lineHeight;
@@ -289,10 +321,13 @@ public class GamePanel extends JPanel implements GameObserver {
      */
     private Color parsePlayerColor(String color) {
         switch(color.toUpperCase()) {
+            case "GREEN":
             case "VERDE":
                 return Color.GREEN;
+            case "BLUE":
             case "AZUL":
                 return Color.BLUE;
+            case "RED":
             case "ROJO":
             default:
                 return Color.RED;

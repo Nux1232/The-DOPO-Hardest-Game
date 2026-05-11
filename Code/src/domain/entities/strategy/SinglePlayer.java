@@ -28,6 +28,7 @@ public class SinglePlayer implements GameModeStrategy {
     public void setUp(List<Player> players) {
         int amountPlayers = Math.min(1, players.size());
         this.players = players.subList(0, amountPlayers);
+        this.levelFinished = false;
     } // Cierre del método
 
     /**

@@ -39,6 +39,7 @@ public class MainWindow extends JFrame implements MenuContext {
     private CardLayout menuLayout;
     private MenuData menuData;
     private boolean levelCompletedScreenVisible;
+    private boolean timeExpiredScreenVisible;
     private final TheDopoHardestGame game = new TheDopoHardestGame();
 
     /**
@@ -67,6 +68,7 @@ public class MainWindow extends JFrame implements MenuContext {
         game.addObserver(scoreBoard);
         game.addObserver(timerDisplay);
         game.addObserver(this::showLevelCompletedIfNeeded);
+        game.addObserver(this::showTimeExpiredIfNeeded);
     } // Cierre del constructor
 
     /**
@@ -131,7 +133,7 @@ public class MainWindow extends JFrame implements MenuContext {
             game.addPlayer(player);
 
             if(menuData.getSelectedMode().equals("Player vs Player")) {
-                Player secondPlayer = PlayerFactory.createPlayer("Jugador 2", menuData.getSelectedSkin());
+                Player secondPlayer = PlayerFactory.createPlayer("Jugador 2", menuData.getSecondSelectedSkin());
                 secondPlayer.setBorderColor(menuData.getSelectedSecondBorderColor());
                 game.addPlayer(secondPlayer);
             }
@@ -139,6 +141,7 @@ public class MainWindow extends JFrame implements MenuContext {
             GameConfiguration configuration = new GameConfiguration(levelFile.getPath());
             Level level = configuration.buildLevel(1);
             levelCompletedScreenVisible = false;
+            timeExpiredScreenVisible = false;
             game.startGame(configuration);
 
             rootLayout.show(rootPanel, "game");
@@ -190,6 +193,22 @@ public class MainWindow extends JFrame implements MenuContext {
     } // Cierre del método
 
     /**
+     * Método privado que encuentra el primer nivel disponible.
+     *
+     * @return File El primer nivel.
+     */
+    private File findFirstLevelFile() {
+        File resources = new File("src/resources");
+        File[] files = resources.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
+        if (files == null || files.length == 0) {
+            return null;
+        }
+
+        java.util.Arrays.sort(files, java.util.Comparator.comparing(File::getName));
+        return files[0];
+    } // Cierre del método
+
+    /**
      * Método privado que muestra el pantalla de nivel completado si es necesario.
      */
     private void showLevelCompletedIfNeeded() {
@@ -201,6 +220,33 @@ public class MainWindow extends JFrame implements MenuContext {
         SwingUtilities.invokeLater(() -> {
             gamePanel.clearPressedKeys();
             changeState(new LevelCompletedState());
+        });
+    } // Cierre del método
+
+    /**
+     * Método privado que muestra la pantalla de derrota cuando se acaba el tiempo.
+     */
+    private void showTimeExpiredIfNeeded() {
+        if (game.getGameState() != GameState.GAME_OVER || timeExpiredScreenVisible) {
+            return;
+        }
+
+        timeExpiredScreenVisible = true;
+        SwingUtilities.invokeLater(() -> {
+            gamePanel.clearPressedKeys();
+            JOptionPane.showMessageDialog(this,
+                    "Se acabó el tiempo, has perdido :(",
+                    "Tiempo agotado",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            File firstLevelFile = findFirstLevelFile();
+            if (firstLevelFile == null) {
+                returnToMainMenu();
+                return;
+            }
+
+            menuData.setSelectedLevelFile(firstLevelFile);
+            startSelectedGame();
         });
     } // Cierre del método
 

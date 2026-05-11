@@ -34,21 +34,17 @@ public class VerticalMovement implements MovementStrategy {
      */
     @Override
     public void move(Enemy enemy, List<Rectangle> walls) {
-        enemy.setY(enemy.getY() + (speed * direction));
-            double newPositionX = enemy.getX();
-            double newPositionY = enemy.getY();
+        double newPositionX = enemy.getX();
+        double newPositionY = enemy.getY() + (speed * direction);
 
-            newPositionY += direction;
+        Rectangle nextPosition = new Rectangle((int)newPositionX, (int)newPositionY, 15, 15);
+        boolean wallColide = walls.stream().anyMatch(wall -> wall.intersects(nextPosition));
 
-
-            Rectangle nextPosition = new Rectangle((int)newPositionX, (int)newPositionY, 15, 15);
-            boolean wallColide = walls.stream().anyMatch(wall -> wall.intersects(nextPosition));
-
-            if(wallColide) {
-                direction *= -1;
-            } else {
-                enemy.setX(newPositionX);
-                enemy.setY(newPositionY);
-            }
+        if(wallColide) {
+            direction *= -1;
+        } else {
+            enemy.setX(newPositionX);
+            enemy.setY(newPositionY);
+        }
     } // Cierre del método
 } // Cierre de la clase

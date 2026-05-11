@@ -5,7 +5,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import domain.entities.factory.GameModeFactory;
 import domain.entities.Player;
 import domain.entities.Enemy;
 import domain.entities.Coin;
@@ -141,9 +140,8 @@ public class GameEngine implements Runnable {
             }
 
             if (System.currentTimeMillis() - lastSecondTime >= 1000) {
-                if (currentState == GameState.PLAYING && remainingTime > 0) {
-                    remainingTime--;
-                }
+                advanceGameClockOneSecond();
+                notifyObservers();
                 lastSecondTime = System.currentTimeMillis();
             }
 
@@ -165,6 +163,21 @@ public class GameEngine implements Runnable {
         checkCoinCollection();
         checkIntermediateZone();
         checkLevelCompletion();
+    } // Cierre del método
+
+    /**
+     * Método que avanza el reloj del juego un segundo.
+     */
+    void advanceGameClockOneSecond() {
+        if (currentState != GameState.PLAYING) return;
+        if (remainingTime > 0) {
+            remainingTime--;
+        }
+        if (remainingTime <= 0) {
+            remainingTime = 0;
+            currentState = GameState.GAME_OVER;
+            running = false;
+        }
     } // Cierre del método
 
     /**

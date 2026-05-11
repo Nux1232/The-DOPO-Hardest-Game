@@ -1,7 +1,6 @@
 package presentation.ui.menu;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 
 /**
@@ -39,14 +38,16 @@ public class SecondPlayerCustomizationState implements MenuScreenState {
         skins.setOpaque(false);
 
         JToggleButton blinky = skinButton("Rojo (Blinky)", Color.RED, true);
-        JToggleButton inky = skinButton("Azul (Inky)", Color.BLUE, false);
-        JToggleButton clyde = skinButton("Verde (Clyde)", Color.GREEN, false);
+        JToggleButton inky = skinButton("Azul (Inky)", Color.BLUE, true);
+        JToggleButton clyde = skinButton("Verde (Clyde)", Color.GREEN, true);
         ButtonGroup skinGroup = new ButtonGroup();
         skinGroup.add(blinky);
         skinGroup.add(inky);
         skinGroup.add(clyde);
         blinky.setSelected(true);
         blinky.addActionListener(event -> context.getMenuData().setSecondSelectedSkin("BLINKY"));
+        inky.addActionListener(event -> context.getMenuData().setSecondSelectedSkin("INKY"));
+        clyde.addActionListener(event -> context.getMenuData().setSecondSelectedSkin("CLYDE"));
 
         skins.add(blinky);
         skins.add(inky);
@@ -56,8 +57,8 @@ public class SecondPlayerCustomizationState implements MenuScreenState {
         JPanel borders = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         borders.setOpaque(false);
         ButtonGroup borderGroup = new ButtonGroup();
-        addBorderOption(context, borders, borderGroup, "Amarillo", Color.YELLOW, true);
-        addBorderOption(context, borders, borderGroup, "Negro", Color.BLACK, false);
+        addBorderOption(context, borders, borderGroup, "Amarillo", Color.YELLOW, false);
+        addBorderOption(context, borders, borderGroup, "Negro", Color.BLACK, true);
         addBorderOption(context, borders, borderGroup, "Blanco", Color.WHITE, false);
         addBorderOption(context, borders, borderGroup, "Morado", Color.MAGENTA, false);
 
@@ -89,8 +90,8 @@ public class SecondPlayerCustomizationState implements MenuScreenState {
         button.setPreferredSize(new Dimension(190, 72));
         button.setBackground(color);
         button.setForeground(color == Color.YELLOW || color == Color.WHITE ? Color.BLACK : Color.WHITE);
-        button.setFocusPainted(false);
         button.setEnabled(enabled);
+        MenuStyles.configureSelectableOption(button);
         return button;
     } // Cierre del método
 
@@ -110,8 +111,7 @@ public class SecondPlayerCustomizationState implements MenuScreenState {
         button.setPreferredSize(new Dimension(105, 40));
         button.setBackground(color);
         button.setForeground(color == Color.YELLOW || color == Color.WHITE ? Color.BLACK : Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorder(new LineBorder(Color.DARK_GRAY, 2));
+        MenuStyles.configureSelectableOption(button);
         button.setSelected(selected);
         button.addActionListener(event -> context.getMenuData().setSelectedSecondBorderColor(color));
         group.add(button);

@@ -1,6 +1,7 @@
 package presentation.ui.menu;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 
 /**
@@ -12,6 +13,8 @@ import java.awt.*;
  */
 class MenuStyles {
     private static final Dimension BUTTON_SIZE = new Dimension(300, 46);
+    private static final Color SELECTED_OUTLINE = new Color(30, 90, 190);
+    private static final Color UNSELECTED_OUTLINE = new Color(80, 86, 96);
 
     /**
      * El constructor privado de la clase MenuStyles (no se instancia).
@@ -95,6 +98,36 @@ class MenuStyles {
         button.setBackground(new Color(190, 194, 204));
         button.setForeground(new Color(80, 80, 80));
         return button;
+    } // Cierre del método
+
+    /**
+     * Método que actualiza el borde visual de una opción seleccionable.
+     *
+     * @param button El botón a actualizar.
+     */
+    static void updateSelectableBorder(AbstractButton button) {
+        Border border;
+        if (button.isSelected()) {
+            border = BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(SELECTED_OUTLINE, 4),
+                    BorderFactory.createLineBorder(Color.WHITE, 2));
+        } else {
+            border = BorderFactory.createLineBorder(UNSELECTED_OUTLINE, 2);
+        }
+        button.setBorder(border);
+    } // Cierre del método
+
+    /**
+     * Método que aplica el estilo base a una opción seleccionable.
+     *
+     * @param button El botón a configurar.
+     */
+    static void configureSelectableOption(AbstractButton button) {
+        button.setFocusPainted(false);
+        button.setOpaque(true);
+        button.setBorderPainted(true);
+        button.addItemListener(event -> updateSelectableBorder(button));
+        updateSelectableBorder(button);
     } // Cierre del método
 
     /**
