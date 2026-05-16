@@ -8,6 +8,7 @@ import domain.entities.strategy.VerticalMovement;
 import domain.exceptions.TheDopoHardestGameException;
 import domain.level.GameConfiguration;
 import domain.level.Level;
+import domain.save.memento.GameMemento;
 import presentation.ui.GamePanel;
 
 import java.awt.Color;
@@ -52,6 +53,10 @@ public class GameEngineTest {
                 GameEngineTest::verticalMovementUsesConfiguredSpeedAndBouncesOnWalls);
         run("HUD is painted inside the current panel size",
                 GameEngineTest::hudIsPaintedInsideCurrentPanelSize);
+        run("save game writes a memento file and load restores menu data",
+                GameEngineTest::saveGameWritesMementoFileAndLoadRestoresData);
+        run("save game restores player state respawn and remaining time",
+                GameEngineTest::saveGameRestoresPlayerStateRespawnAndRemainingTime);
 
         System.out.println("OK - " + testsRun + " tests passed.");
     }
@@ -236,6 +241,94 @@ public class GameEngineTest {
         int background = new Color(173, 216, 230).getRGB();
         int hudPixel = image.getRGB(10, 10);
         assertTrue(hudPixel != background, "the HUD should be visible near the top-left margin");
+    }
+
+    private static void saveGameWritesMementoFileAndLoadRestoresData() throws Exception {
+        resetEngine();
+        TheDopoHardestGame game = new TheDopoHardestGame();
+        game.clearPlayers();
+        game.setGameMode("Player vs Player");
+
+        Player firstPlayer = PlayerFactory.createPlayer("Jugador 1", "INKY");
+        firstPlayer.setBorderColor(Color.MAGENTA);
+        Player secondPlayer = PlayerFactory.createPlayer("Jugador 2", "CLYDE");
+        secondPlayer.setBorderColor(Color.WHITE);
+        game.addPlayer(firstPlayer);
+        game.addPlayer(secondPlayer);
+
+        File levelFile = File.createTempFile("level-save-test", ".txt");
+        levelFile.deleteOnExit();
+        try (FileWriter writer = new FileWriter(levelFile)) {
+            writer.write("TIME 45\n");
+            writer.write("START 10 20\n");
+            writer.write("FINAL_ZONE 700 500\n");
+        }
+
+        File saveFile = File.createTempFile("game-save-test", ".txt");
+        saveFile.deleteOnExit();
+
+        game.startGame(new GameConfiguration(levelFile.getAbsolutePath()), levelFile);
+        game.saveGame(saveFile);
+        game.endGame();
+
+        GameMemento memento = game.loadGame(saveFile);
+
+        assertTrue(saveFile.length() > 0, "save file should be written to disk");
+        assertEquals("Player vs Player", memento.getMode(), "saved mode");
+        assertEquals("BLUE", memento.getSkin(), "first player skin");
+        assertEquals(Color.MAGENTA, memento.getBorderColor(), "first player border");
+        assertEquals("VERDE", memento.getSecondSkin(), "second player skin");
+        assertEquals(Color.WHITE, memento.getSecondBorderColor(), "second player border");
+        assertEquals(levelFile.getAbsolutePath(), memento.getLevelFile().getAbsolutePath(), "saved level file");
+    }
+
+    private static void saveGameRestoresPlayerStateRespawnAndRemainingTime() throws Exception {
+        GameEngine engine = resetEngine();
+        TheDopoHardestGame game = new TheDopoHardestGame();
+        game.clearPlayers();
+        game.setGameMode("Player");
+
+        Player player = PlayerFactory.createPlayer("Jugador 1", "BLINKY");
+        player.setBorderColor(Color.YELLOW);
+        game.addPlayer(player);
+
+        File levelFile = File.createTempFile("level-state-save-test", ".txt");
+        levelFile.deleteOnExit();
+        try (FileWriter writer = new FileWriter(levelFile)) {
+            writer.write("TIME 45\n");
+            writer.write("START 10 20\n");
+            writer.write("INTERMEDIATE_ZONE 120 120\n");
+            writer.write("FINAL_ZONE 700 500\n");
+            writer.write("COIN 120 120 BLUE\n");
+        }
+
+        File saveFile = File.createTempFile("game-state-save-test", ".txt");
+        saveFile.deleteOnExit();
+
+        game.startGame(new GameConfiguration(levelFile.getAbsolutePath()), levelFile);
+        engine.advanceGameClockOneSecond();
+        player.resetPosition(120, 120);
+        invokeUpdate(engine);
+        player.resetPosition(250, 260);
+        game.saveGame(saveFile);
+        game.endGame();
+
+        GameMemento memento = game.loadGame(saveFile);
+        game.clearPlayers();
+        Player restoredPlayer = PlayerFactory.createPlayer("Jugador 1", memento.getSkin());
+        game.addPlayer(restoredPlayer);
+        game.startGame(new GameConfiguration(memento.getLevelFile().getAbsolutePath()),
+                memento.getLevelFile(), memento);
+
+        assertEquals(44, game.getRemainingTime(), "remaining time should be restored");
+        assertDoubleEquals(250, restoredPlayer.getX(), "player x position should be restored");
+        assertDoubleEquals(260, restoredPlayer.getY(), "player y position should be restored");
+
+        restoredPlayer.handleHit();
+
+        assertDoubleEquals(120, restoredPlayer.getX(), "respawn x should be restored from the safe zone");
+        assertDoubleEquals(120, restoredPlayer.getY(), "respawn y should be restored from the safe zone");
+        assertEquals(1, restoredPlayer.getCollectedCoins(), "collected coins should be restored");
     }
 
     private static Level basicLevel(int startX, int startY, int timeLimit) {

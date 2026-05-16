@@ -24,12 +24,15 @@ public class PlayerFactory {
         if (type == null) type = "BLINKY";
         switch (type.toUpperCase()) {
             case "INKY":
+            case "BLUE":
             case "AZUL":
                 return new Inky(name);
             case "CLYDE":
+            case "GREEN":
             case "VERDE":
                 return new Clyde(name);
             case "BLINKY":
+            case "RED":
             case "ROJO":
             default:
                 return new Blinky(name);

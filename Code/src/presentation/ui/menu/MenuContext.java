@@ -15,6 +15,7 @@ public interface MenuContext {
     void startSelectedGame();
     void startNextLevel();
     void loadSavedGame();
+    void saveGame();
     void resumeGame();
     void returnToMainMenu();
     TheDopoHardestGame getGame();

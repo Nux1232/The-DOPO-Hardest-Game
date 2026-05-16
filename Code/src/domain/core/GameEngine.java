@@ -356,7 +356,7 @@ public class GameEngine implements Runnable {
     /**
      * Método privado que notifica a los observadores del estado del juego.
      */
-    private void notifyObservers() {
+    private void notifyObservers() {    // revisar metodo cuando halla tiempo
         for (GameObserver o : new ArrayList<>(observers)) o.update();
     } // Cierre del método
 
@@ -384,22 +384,93 @@ public class GameEngine implements Runnable {
 
     public GameMemento createMemento() {
         Player player = players.isEmpty() ? null : players.get(0);
-        return new GameMemento(gameMode.getClass().getSimpleName(),
+        Player secondPlayer = players.size() > 1 ? players.get(1) : null;
+        List<GameMemento.PlayerSnapshot> playerSnapshots = new ArrayList<>();
+        for (Player currentPlayer : players) {
+            playerSnapshots.add(new GameMemento.PlayerSnapshot(
+                    currentPlayer.getColor(),
+                    currentPlayer.getBorderColor(),
+                    currentPlayer.getX(),
+                    currentPlayer.getY(),
+                    currentPlayer.getCurrentSpeed(),
+                    currentPlayer.getSizeMultiplier(),
+                    currentPlayer.getRespawnX(),
+                    currentPlayer.getRespawnY(),
+                    currentPlayer.getDeaths(),
+                    currentPlayer.getCollectedCoinIndexes(),
+                    currentPlayer.hasShield(),
+                    currentPlayer.isInvincible(),
+                    currentPlayer.getInvincibilityTimer()));
+        }
+        return new GameMemento(getCurrentModeName(),
                 player!= null ? player.getColor() : "RED",
         player != null ? player.getBorderColor() : Color.BLACK,
-        currentLevelFile);
+        secondPlayer != null ? secondPlayer.getColor() : "RED",
+        secondPlayer != null ? secondPlayer.getBorderColor() : Color.BLACK,
+        currentLevelFile,
+        remainingTime,
+        playerSnapshots);
     } // Cierre del método
 
     public void restoreMemento(GameMemento memento) {
         setGameMode(memento.getMode());
         this.currentLevelFile = memento.getLevelFile();
+        if (memento.getRemainingTime() >= 0) {
+            this.remainingTime = memento.getRemainingTime();
+        }
+        List<GameMemento.PlayerSnapshot> snapshots = memento.getPlayerSnapshots();
+        if(!snapshots.isEmpty()) {
+            int amountPlayers = Math.min(players.size(), snapshots.size());
+            for (int i = 0; i < amountPlayers; i++) {
+                Player player = players.get(i);
+                GameMemento.PlayerSnapshot snapshot = snapshots.get(i);
+                player.restoreSavedState(snapshot.getSkin(), snapshot.getBorderColor(),
+                        snapshot.getX(), snapshot.getY(), snapshot.getCurrentSpeed(),
+                        snapshot.getSizeMultiplier(), snapshot.getRespawnX(), snapshot.getRespawnY(),
+                        snapshot.getDeaths(), snapshot.getCollectedCoins(), snapshot.hasShield(),
+                        snapshot.isInvincible(), snapshot.getInvincibilityTimer());
+            }
+            restoreCollectedCoinsOnLevel();
+            gameMode.setUp(players);
+            return;
+        }
         if(!players.isEmpty()) {
             Player player = players.get(0);
             player.applySkin(memento.getSkin(), player.getCurrentSpeed(),
                     player.getSizeMultiplier());
             player.setBorderColor(memento.getBorderColor());
         }
+        if(players.size() > 1) {
+            Player secondPlayer = players.get(1);
+            secondPlayer.applySkin(memento.getSecondSkin(), secondPlayer.getCurrentSpeed(),
+                    secondPlayer.getSizeMultiplier());
+            secondPlayer.setBorderColor(memento.getSecondBorderColor());
+        }
+        gameMode.setUp(players);
     } // Cierre del método
+
+    private void restoreCollectedCoinsOnLevel() {
+        if(currentLevel == null || players.isEmpty()) {
+            return;
+        }
+
+        if(gameMode.independentGameModeCoins()) {
+            return;
+        }
+
+        Player player = players.get(0);
+        for(Integer coinIndex : player.getCollectedCoinIndexes()) {
+            if(coinIndex >= 0 && coinIndex < currentLevel.getCoins().size()) {
+                currentLevel.getCoins().get(coinIndex).collect();
+            }
+        }
+    } // Cierre del metodo
+
+    private String getCurrentModeName() {
+        return gameMode.getClass().getSimpleName().equals("PlayerVsPlayer")
+                ? "Player vs Player"
+                : "Player";
+    } // Cierre del metodo
 
     public void setCurrentLevelFile(File currentLevel) {
         this.currentLevelFile = currentLevel;
