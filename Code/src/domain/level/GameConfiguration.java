@@ -4,6 +4,7 @@ import domain.level.builder.ConcreteLevelBuilder;
 import domain.level.builder.LevelBuilder;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import domain.exceptions.TheDopoHardestGameException;
 
 /**
  * Clase que contiene la configuracion del juego.
@@ -14,7 +15,7 @@ import java.io.FileReader;
  */
 
 public class GameConfiguration {
-    private String filePath;
+    private final String filePath;
 
     /**
      * Constructor de la clase GameConfiguration.
@@ -31,7 +32,7 @@ public class GameConfiguration {
      * @param id El identificador de un nivel.
      * @return Level El nivel construido.
      */
-    public Level buildLevel(int id) {
+    public Level buildLevel(int id) throws TheDopoHardestGameException {
         LevelBuilder builder = new ConcreteLevelBuilder();
         builder.reset(id);
 
@@ -39,9 +40,9 @@ public class GameConfiguration {
             String line;
             while((line = bufferedReader.readLine()) != null) {
                 line = line.trim();
-                if(line.isEmpty()) continue;
+                if(line.isEmpty() || line.startsWith("#")) continue;
 
-                String[] parts = line.split(" ");
+                String[] parts = line.split("\\s+");
                 switch(parts[0].toUpperCase()) {
                     case "TIME":
                         builder.setTimeLimit(Integer.parseInt(parts[1]));
@@ -65,10 +66,12 @@ public class GameConfiguration {
                     case "ENEMY":
                         builder.addEnemy(parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
                         break;
+                    default:
+                        throw new IllegalArgumentException("Configuración desconocida: " + parts[0]);
                 }
             }
         } catch (Exception exception) {
-            System.out.println("Error leyendo la configuración del nivel: " + exception.getMessage());
+            throw new TheDopoHardestGameException(TheDopoHardestGameException.LEVEL_LOAD_ERROR + ": " + exception.getMessage());
         }
         return builder.build();
     } // Cierre del método

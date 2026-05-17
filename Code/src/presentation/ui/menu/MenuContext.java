@@ -7,7 +7,7 @@ import domain.core.TheDopoHardestGame;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 09/05/2026
+ * @version 16/05/2026
  */
 public interface MenuContext {
     MenuData getMenuData();
@@ -15,6 +15,7 @@ public interface MenuContext {
     void startSelectedGame();
     void startNextLevel();
     void loadSavedGame();
+    void saveGame();
     void resumeGame();
     void returnToMainMenu();
     TheDopoHardestGame getGame();

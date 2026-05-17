@@ -12,7 +12,6 @@ import domain.level.Level;
 import domain.entities.factory.GameModeFactory;
 import domain.entities.strategy.GameModeStrategy;
 import domain.save.memento.GameMemento;
-import presentation.ui.observer.GameObserver;
 import java.awt.geom.Rectangle2D;
 
 /**
@@ -20,7 +19,7 @@ import java.awt.geom.Rectangle2D;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 02/05/2026
+ * @version 16/05/2026
  */
 
 public class GameEngine implements Runnable {
@@ -168,7 +167,7 @@ public class GameEngine implements Runnable {
     /**
      * Método que avanza el reloj del juego un segundo.
      */
-    void advanceGameClockOneSecond() {
+    public void advanceGameClockOneSecond() {
         if (currentState != GameState.PLAYING) return;
         if (remainingTime > 0) {
             remainingTime--;
@@ -353,6 +352,7 @@ public class GameEngine implements Runnable {
         return gameMode.getWinner(players);
     } // Cierre del método
 
+    // Método pendiente por revisar
     /**
      * Método privado que notifica a los observadores del estado del juego.
      */
@@ -384,22 +384,124 @@ public class GameEngine implements Runnable {
 
     public GameMemento createMemento() {
         Player player = players.isEmpty() ? null : players.get(0);
-        return new GameMemento(gameMode.getClass().getSimpleName(),
-                player!= null ? player.getColor() : "RED",
-        player != null ? player.getBorderColor() : Color.BLACK,
-        currentLevelFile);
+        Player secondPlayer = players.size() > 1 ? players.get(1) : null;
+
+        List<GameMemento.PlayerSnapshot> playerSnapshots = new ArrayList<>();
+
+        for (Player currentPlayer : players) {
+            playerSnapshots.add(new GameMemento.PlayerSnapshot(
+                    currentPlayer.getColor(),
+                    currentPlayer.getBorderColor(),
+                    currentPlayer.getX(),
+                    currentPlayer.getY(),
+                    currentPlayer.getCurrentSpeed(),
+                    currentPlayer.getSizeMultiplier(),
+                    currentPlayer.getRespawnX(),
+                    currentPlayer.getRespawnY(),
+                    currentPlayer.getDeaths(),
+                    currentPlayer.getCollectedCoinIndexes(),
+                    currentPlayer.hasShield(),
+                    currentPlayer.isInvincible(),
+                    currentPlayer.getInvincibilityTimer()));
+            }
+
+        return new GameMemento(
+                getCurrentModeName(),
+                player != null ? player.getColor() : "RED",
+                player != null ? player.getBorderColor() : Color.BLACK,
+                secondPlayer != null ? secondPlayer.getColor() : "RED",
+                secondPlayer != null ? secondPlayer.getBorderColor() : Color.BLACK,
+                currentLevelFile,
+                remainingTime,
+                playerSnapshots);
     } // Cierre del método
 
     public void restoreMemento(GameMemento memento) {
         setGameMode(memento.getMode());
         this.currentLevelFile = memento.getLevelFile();
+
+        if (memento.getRemainingTime() >= 0) {
+            this.remainingTime = memento.getRemainingTime();
+        }
+
+        List<GameMemento.PlayerSnapshot> snapshots = memento.getPlayerSnapshots();
+
+        if(!snapshots.isEmpty()) {
+            int amountPlayers = Math.min(players.size(), snapshots.size());
+
+            for (int i = 0; i < amountPlayers; i++) {
+                Player player = players.get(i);
+                GameMemento.PlayerSnapshot snapshot = snapshots.get(i);
+
+                player.restoreSavedState(
+                        snapshot.getSkin(),
+                        snapshot.getBorderColor(),
+                        snapshot.getX(),
+                        snapshot.getY(),
+                        snapshot.getCurrentSpeed(),
+                        snapshot.getSizeMultiplier(),
+                        snapshot.getRespawnX(),
+                        snapshot.getRespawnY(),
+                        snapshot.getDeaths(),
+                        snapshot.getCollectedCoins(),
+                        snapshot.hasShield(),
+                        snapshot.isInvincible(),
+                        snapshot.getInvincibilityTimer());
+            }
+
+            restoreCollectedCoinsOnLevel();
+            gameMode.setUp(players);
+            return;
+        }
+
         if(!players.isEmpty()) {
             Player player = players.get(0);
-            player.applySkin(memento.getSkin(), player.getCurrentSpeed(),
+
+            player.applySkin(
+                    memento.getSkin(),
+                    player.getCurrentSpeed(),
                     player.getSizeMultiplier());
+
             player.setBorderColor(memento.getBorderColor());
         }
-    } // Cierre del método
+
+        if(players.size() > 1) {
+            Player secondPlayer = players.get(1);
+
+            secondPlayer.applySkin(
+                    memento.getSecondSkin(),
+                    secondPlayer.getCurrentSpeed(),
+                    secondPlayer.getSizeMultiplier());
+
+            secondPlayer.setBorderColor(memento.getSecondBorderColor());
+        }
+
+        gameMode.setUp(players);
+    }
+
+    private void restoreCollectedCoinsOnLevel() {
+        if(currentLevel == null || players.isEmpty()) {
+            return;
+        }
+
+        if(gameMode.independentGameModeCoins()) {
+            return;
+        }
+
+        Player player = players.get(0);
+
+        for(Integer coinIndex : player.getCollectedCoinIndexes()) {
+            if(coinIndex >= 0 && coinIndex < currentLevel.getCoins().size()) {
+                currentLevel.getCoins().get(coinIndex).collect();
+            }
+        }
+    }
+
+    private String getCurrentModeName() {
+        return gameMode.getClass().getSimpleName().equals("PlayerVsPlayer")
+                ? "Player vs Player"
+                : "Player";
+    }
 
     public void setCurrentLevelFile(File currentLevel) {
         this.currentLevelFile = currentLevel;

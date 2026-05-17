@@ -8,7 +8,12 @@ import domain.entities.strategy.VerticalMovement;
 import domain.exceptions.TheDopoHardestGameException;
 import domain.level.GameConfiguration;
 import domain.level.Level;
+import domain.save.memento.GameMemento;
 import presentation.ui.GamePanel;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -21,7 +26,7 @@ import java.lang.reflect.Method;
 import java.util.Collections;
 
 /**
- * Clase que permite realizar pruebas de unidad del juego.
+ * Clase que permite realizar pruebas de unidad del juego usando JUnit 5.
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
@@ -29,34 +34,10 @@ import java.util.Collections;
  */
 
 public class GameEngineTest {
-    private static int testsRun = 0;
 
-    public static void main(String[] args) throws Exception {
-        run("single player collects a coin once and receives its effect",
-                GameEngineTest::singlePlayerCollectsCoinOnceAndReceivesEffect);
-        run("player vs player collects coins independently",
-                GameEngineTest::playerVsPlayerCollectsCoinsIndependently);
-        run("clock reaches zero and changes the game to game over",
-                GameEngineTest::clockReachesZeroAndChangesToGameOver);
-        run("player cannot move through walls",
-                GameEngineTest::playerCannotMoveThroughWalls);
-        run("intermediate safe zone updates respawn point",
-                GameEngineTest::intermediateSafeZoneUpdatesRespawnPoint);
-        run("single player victory resets when a new level is loaded",
-                GameEngineTest::singlePlayerVictoryResetsWhenNewLevelIsLoaded);
-        run("player factory creates expected skins",
-                GameEngineTest::playerFactoryCreatesExpectedSkins);
-        run("game configuration builds a level from a file",
-                GameEngineTest::gameConfigurationBuildsLevelFromFile);
-        run("vertical movement uses configured speed and bounces on walls",
-                GameEngineTest::verticalMovementUsesConfiguredSpeedAndBouncesOnWalls);
-        run("HUD is painted inside the current panel size",
-                GameEngineTest::hudIsPaintedInsideCurrentPanelSize);
-
-        System.out.println("OK - " + testsRun + " tests passed.");
-    }
-
-    private static void singlePlayerCollectsCoinOnceAndReceivesEffect() throws Exception {
+    @Test
+    @DisplayName("single player collects a coin once and receives its effect")
+    void singlePlayerCollectsCoinOnceAndReceivesEffect() throws Exception {
         GameEngine engine = resetEngine();
         Player player = PlayerFactory.createPlayer("Jugador 1", "ROJO");
         engine.getPlayers().add(player);
@@ -73,10 +54,12 @@ public class GameEngineTest {
         assertEquals(1, player.getCollectedCoins(), "the player should collect the coin only once");
         assertEquals(1, engine.getCollectedCoinsCount(), "the engine should count the collected coin");
         assertEquals("AZUL", player.getColor(), "a blue coin should apply the blue skin");
-        assertDoubleEquals(1.75, player.getCurrentSpeed(), "the blue skin should update speed");
+        assertEquals(1.75, player.getCurrentSpeed(), 0.0001, "the blue skin should update speed");
     }
 
-    private static void playerVsPlayerCollectsCoinsIndependently() throws Exception {
+    @Test
+    @DisplayName("player vs player collects coins independently")
+    void playerVsPlayerCollectsCoinsIndependently() throws Exception {
         GameEngine engine = resetEngine();
         engine.setGameMode("Player vs Player");
         Player firstPlayer = PlayerFactory.createPlayer("Jugador 1", "ROJO");
@@ -100,7 +83,9 @@ public class GameEngineTest {
         assertEquals(1, secondPlayer.getCollectedCoins(), "second player coin count");
     }
 
-    private static void clockReachesZeroAndChangesToGameOver() {
+    @Test
+    @DisplayName("clock reaches zero and changes the game to game over")
+    void clockReachesZeroAndChangesToGameOver() {
         GameEngine engine = resetEngine();
         engine.getPlayers().add(PlayerFactory.createPlayer("Jugador 1", "ROJO"));
 
@@ -112,7 +97,9 @@ public class GameEngineTest {
         assertEquals(GameState.GAME_OVER, engine.getCurrentState(), "the game should end when time expires");
     }
 
-    private static void playerCannotMoveThroughWalls() {
+    @Test
+    @DisplayName("player cannot move through walls")
+    void playerCannotMoveThroughWalls() {
         GameEngine engine = resetEngine();
         Player player = PlayerFactory.createPlayer("Jugador 1", "ROJO");
         engine.getPlayers().add(player);
@@ -122,11 +109,13 @@ public class GameEngineTest {
         engine.loadLevel(level);
         engine.movePlayer(player, "RIGHT");
 
-        assertDoubleEquals(20, player.getX(), "wall collision should keep the player x position");
-        assertDoubleEquals(20, player.getY(), "wall collision should keep the player y position");
+        assertEquals(20.0, player.getX(), 0.0001, "wall collision should keep the player x position");
+        assertEquals(20.0, player.getY(), 0.0001, "wall collision should keep the player y position");
     }
 
-    private static void intermediateSafeZoneUpdatesRespawnPoint() throws Exception {
+    @Test
+    @DisplayName("intermediate safe zone updates respawn point")
+    void intermediateSafeZoneUpdatesRespawnPoint() throws Exception {
         GameEngine engine = resetEngine();
         Player player = PlayerFactory.createPlayer("Jugador 1", "ROJO");
         engine.getPlayers().add(player);
@@ -140,12 +129,14 @@ public class GameEngineTest {
         player.resetPosition(300, 300);
         player.handleHit();
 
-        assertDoubleEquals(120, player.getX(), "player should respawn at the intermediate safe zone x");
-        assertDoubleEquals(120, player.getY(), "player should respawn at the intermediate safe zone y");
+        assertEquals(120.0, player.getX(), 0.0001, "player should respawn at the intermediate safe zone x");
+        assertEquals(120.0, player.getY(), 0.0001, "player should respawn at the intermediate safe zone y");
         assertEquals(1, player.getDeaths(), "hitting the player should count one death");
     }
 
-    private static void singlePlayerVictoryResetsWhenNewLevelIsLoaded() throws Exception {
+    @Test
+    @DisplayName("single player victory resets when a new level is loaded")
+    void singlePlayerVictoryResetsWhenNewLevelIsLoaded() throws Exception {
         GameEngine engine = resetEngine();
         Player player = PlayerFactory.createPlayer("Jugador 1", "ROJO");
         engine.getPlayers().add(player);
@@ -165,7 +156,9 @@ public class GameEngineTest {
         assertEquals(GameState.PLAYING, engine.getCurrentState(), "loading a new level should reset victory state");
     }
 
-    private static void playerFactoryCreatesExpectedSkins() {
+    @Test
+    @DisplayName("player factory creates expected skins")
+    void playerFactoryCreatesExpectedSkins() {
         Player red = PlayerFactory.createPlayer("Rojo", "BLINKY");
         Player blue = PlayerFactory.createPlayer("Azul", "INKY");
         Player green = PlayerFactory.createPlayer("Verde", "CLYDE");
@@ -173,11 +166,13 @@ public class GameEngineTest {
         assertEquals("RED", red.getColor(), "Blinky should start red");
         assertEquals("BLUE", blue.getColor(), "Inky should start blue");
         assertEquals("VERDE", green.getColor(), "Clyde should start green");
-        assertDoubleEquals(1.25, red.getCurrentSpeed(), "Blinky speed");
-        assertDoubleEquals(1.75, blue.getCurrentSpeed(), "Inky speed");
+        assertEquals(1.25, red.getCurrentSpeed(), 0.0001, "Blinky speed");
+        assertEquals(1.75, blue.getCurrentSpeed(), 0.0001, "Inky speed");
     }
 
-    private static void gameConfigurationBuildsLevelFromFile() throws Exception {
+    @Test
+    @DisplayName("game configuration builds a level from a file")
+    void gameConfigurationBuildsLevelFromFile() throws Exception {
         File file = File.createTempFile("level-test", ".txt");
         file.deleteOnExit();
         try (FileWriter writer = new FileWriter(file)) {
@@ -202,21 +197,25 @@ public class GameEngineTest {
         assertEquals(1, level.getEnemies().size(), "enemy count");
     }
 
-    private static void verticalMovementUsesConfiguredSpeedAndBouncesOnWalls() {
+    @Test
+    @DisplayName("vertical movement uses configured speed and bounces on walls")
+    void verticalMovementUsesConfiguredSpeedAndBouncesOnWalls() {
         Enemy enemy = new Enemy(10, 10);
         VerticalMovement movement = new VerticalMovement(2.0);
 
         movement.move(enemy, Collections.emptyList());
-        assertDoubleEquals(12, enemy.getY(), "enemy should move by its configured speed");
+        assertEquals(12.0, enemy.getY(), 0.0001, "enemy should move by its configured speed");
 
         movement.move(enemy, Collections.singletonList(new Rectangle(10, 14, 20, 20)));
-        assertDoubleEquals(12, enemy.getY(), "enemy should not enter a wall");
+        assertEquals(12.0, enemy.getY(), 0.0001, "enemy should not enter a wall");
 
         movement.move(enemy, Collections.emptyList());
-        assertDoubleEquals(10, enemy.getY(), "enemy should reverse direction after touching a wall");
+        assertEquals(10.0, enemy.getY(), 0.0001, "enemy should reverse direction after touching a wall");
     }
 
-    private static void hudIsPaintedInsideCurrentPanelSize() throws TheDopoHardestGameException {
+    @Test
+    @DisplayName("HUD is painted inside the current panel size")
+    void hudIsPaintedInsideCurrentPanelSize() throws TheDopoHardestGameException {
         GameEngine engine = resetEngine();
         TheDopoHardestGame game = new TheDopoHardestGame();
         game.clearPlayers();
@@ -238,7 +237,99 @@ public class GameEngineTest {
         assertTrue(hudPixel != background, "the HUD should be visible near the top-left margin");
     }
 
-    private static Level basicLevel(int startX, int startY, int timeLimit) {
+    @Test
+    @DisplayName("save game writes a memento file and load restores menu data")
+    void saveGameWritesMementoFileAndLoadRestoresData() throws Exception {
+        resetEngine();
+        TheDopoHardestGame game = new TheDopoHardestGame();
+        game.clearPlayers();
+        game.setGameMode("Player vs Player");
+
+        Player firstPlayer = PlayerFactory.createPlayer("Jugador 1", "INKY");
+        firstPlayer.setBorderColor(Color.MAGENTA);
+        Player secondPlayer = PlayerFactory.createPlayer("Jugador 2", "CLYDE");
+        secondPlayer.setBorderColor(Color.WHITE);
+        game.addPlayer(firstPlayer);
+        game.addPlayer(secondPlayer);
+
+        File levelFile = File.createTempFile("level-save-test", ".txt");
+        levelFile.deleteOnExit();
+        try (FileWriter writer = new FileWriter(levelFile)) {
+            writer.write("TIME 45\n");
+            writer.write("START 10 20\n");
+            writer.write("FINAL_ZONE 700 500\n");
+        }
+
+        File saveFile = File.createTempFile("game-save-test", ".txt");
+        saveFile.deleteOnExit();
+
+        game.startGame(new GameConfiguration(levelFile.getAbsolutePath()), levelFile);
+        game.saveGame(saveFile);
+        game.endGame();
+
+        GameMemento memento = game.loadLevel(saveFile);
+
+        assertTrue(saveFile.length() > 0, "save file should be written to disk");
+        assertEquals("Player vs Player", memento.getMode(), "saved mode");
+        assertEquals("BLUE", memento.getSkin(), "first player skin");
+        assertEquals(Color.MAGENTA, memento.getBorderColor(), "first player border");
+        assertEquals("VERDE", memento.getSecondSkin(), "second player skin");
+        assertEquals(Color.WHITE, memento.getSecondBorderColor(), "second player border");
+        assertEquals(levelFile.getAbsolutePath(), memento.getLevelFile().getAbsolutePath(), "saved level file");
+    }
+
+    @Test
+    @DisplayName("save game restores player state respawn and remaining time")
+    void saveGameRestoresPlayerStateRespawnAndRemainingTime() throws Exception {
+        GameEngine engine = resetEngine();
+        TheDopoHardestGame game = new TheDopoHardestGame();
+        game.clearPlayers();
+        game.setGameMode("Player");
+
+        Player player = PlayerFactory.createPlayer("Jugador 1", "BLINKY");
+        player.setBorderColor(Color.YELLOW);
+        game.addPlayer(player);
+
+        File levelFile = File.createTempFile("level-state-save-test", ".txt");
+        levelFile.deleteOnExit();
+        try (FileWriter writer = new FileWriter(levelFile)) {
+            writer.write("TIME 45\n");
+            writer.write("START 10 20\n");
+            writer.write("INTERMEDIATE_ZONE 120 120\n");
+            writer.write("FINAL_ZONE 700 500\n");
+            writer.write("COIN 120 120 BLUE\n");
+        }
+
+        File saveFile = File.createTempFile("game-state-save-test", ".txt");
+        saveFile.deleteOnExit();
+
+        game.startGame(new GameConfiguration(levelFile.getAbsolutePath()), levelFile);
+        engine.advanceGameClockOneSecond();
+        player.resetPosition(120, 120);
+        invokeUpdate(engine);
+        player.resetPosition(250, 260);
+        game.saveGame(saveFile);
+        game.endGame();
+
+        GameMemento memento = game.loadLevel(saveFile);
+        game.clearPlayers();
+        Player restoredPlayer = PlayerFactory.createPlayer("Jugador 1", memento.getSkin());
+        game.addPlayer(restoredPlayer);
+        game.startGame(new GameConfiguration(memento.getLevelFile().getAbsolutePath()),
+                memento.getLevelFile(), memento);
+
+        assertEquals(44, game.getRemainingTime(), "remaining time should be restored");
+        assertEquals(250.0, restoredPlayer.getX(), 0.0001, "player x position should be restored");
+        assertEquals(260.0, restoredPlayer.getY(), 0.0001, "player y position should be restored");
+
+        restoredPlayer.handleHit();
+
+        assertEquals(120.0, restoredPlayer.getX(), 0.0001, "respawn x should be restored from the safe zone");
+        assertEquals(120.0, restoredPlayer.getY(), 0.0001, "respawn y should be restored from the safe zone");
+        assertEquals(1, restoredPlayer.getCollectedCoins(), "collected coins should be restored");
+    }
+
+    private Level basicLevel(int startX, int startY, int timeLimit) {
         Level level = new Level(1);
         level.setStartPoint(new Point(startX, startY));
         level.setFinalSafeZone(new Point(700, 500));
@@ -246,7 +337,7 @@ public class GameEngineTest {
         return level;
     }
 
-    private static GameEngine resetEngine() {
+    private GameEngine resetEngine() {
         GameEngine engine = GameEngine.getInstance();
         engine.returnToMenu();
         engine.getPlayers().clear();
@@ -254,38 +345,9 @@ public class GameEngineTest {
         return engine;
     }
 
-    private static void invokeUpdate(GameEngine engine) throws Exception {
+    private void invokeUpdate(GameEngine engine) throws Exception {
         Method update = GameEngine.class.getDeclaredMethod("update");
         update.setAccessible(true);
         update.invoke(engine);
-    }
-
-    private static void run(String name, TestCase testCase) throws Exception {
-        testCase.run();
-        testsRun++;
-        System.out.println("PASS - " + name);
-    }
-
-    private static void assertTrue(boolean condition, String message) {
-        if (!condition) {
-            throw new AssertionError(message);
-        }
-    }
-
-    private static void assertEquals(Object expected, Object actual, String message) {
-        if (!expected.equals(actual)) {
-            throw new AssertionError(message + " expected:<" + expected + "> but was:<" + actual + ">");
-        }
-    }
-
-    private static void assertDoubleEquals(double expected, double actual, String message) {
-        if (Math.abs(expected - actual) > 0.0001) {
-            throw new AssertionError(message + " expected:<" + expected + "> but was:<" + actual + ">");
-        }
-    }
-
-    @FunctionalInterface
-    private interface TestCase {
-        void run() throws Exception;
     }
 } // Cierre de la clase

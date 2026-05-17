@@ -1,15 +1,13 @@
 package presentation.ui;
 
-import domain.core.GameEngine;
 import domain.core.GameState;
 import domain.core.TheDopoHardestGame;
+import domain.core.TheDopoHardestGameLogger;
 import domain.entities.Player;
 import domain.entities.factory.PlayerFactory;
 import domain.exceptions.TheDopoHardestGameException;
 import domain.level.GameConfiguration;
 import domain.level.Level;
-import domain.save.memento.GameCaretaker;
-import domain.save.memento.GameMemento;
 import presentation.ui.menu.MenuContext;
 import presentation.ui.menu.MenuData;
 import presentation.ui.menu.MenuScreenState;
@@ -18,6 +16,8 @@ import presentation.ui.menu.LevelCompletedState;
 import presentation.ui.menu.PauseMenuState;
 import presentation.ui.observer.ScoreBoard;
 import presentation.ui.observer.TimerDisplay;
+import domain.save.memento.GameCaretaker;
+import domain.save.memento.GameMemento;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,7 +29,7 @@ import java.io.IOException;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 09/05/2026
+ * @version 16/05/2026
  */
 public class MainWindow extends JFrame implements MenuContext {
     private GamePanel gamePanel;
@@ -43,6 +43,7 @@ public class MainWindow extends JFrame implements MenuContext {
     private boolean levelCompletedScreenVisible;
     private boolean timeExpiredScreenVisible;
     private final TheDopoHardestGame game = new TheDopoHardestGame();
+    private GameMemento pendingSavedGame;
 
     /**
      * Constructor de la clase MainWindow.
@@ -81,14 +82,6 @@ public class MainWindow extends JFrame implements MenuContext {
         setLocationRelativeTo(null);
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setVisible(true);
-    } // Cierre del método
-
-    /**
-     * Método que devuelve el panel del juego.
-     * @return GamePanel El panel del juego.
-     */
-    public GamePanel getGamePanel() {
-        return gamePanel;
     } // Cierre del método
 
     /**
@@ -141,16 +134,18 @@ public class MainWindow extends JFrame implements MenuContext {
             }
 
             GameConfiguration configuration = new GameConfiguration(levelFile.getPath());
-            Level level = configuration.buildLevel(1);
             levelCompletedScreenVisible = false;
             timeExpiredScreenVisible = false;
-            game.startGame(configuration);
+            game.startGame(configuration, levelFile, pendingSavedGame);
+            pendingSavedGame = null;
 
             rootLayout.show(rootPanel, "game");
             SwingUtilities.invokeLater(() -> gamePanel.requestFocusInWindow());
         } catch (TheDopoHardestGameException e) {
+            pendingSavedGame = null;
             JOptionPane.showMessageDialog(this, "Error al iniciar el juego: " + e.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
+            TheDopoHardestGameLogger.getInstance().logException(e);
         }
     } // Cierre del método
 
@@ -179,7 +174,7 @@ public class MainWindow extends JFrame implements MenuContext {
      */
     private File findNextLevelFile() {
         File currentFile = menuData.getSelectedLevelFile();
-        File resources = new File("src/resources");
+        File resources = getLevelResourcesDirectory();
         File[] files = resources.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
         if (currentFile == null || files == null || files.length == 0) {
             return null;
@@ -200,7 +195,7 @@ public class MainWindow extends JFrame implements MenuContext {
      * @return File El primer nivel.
      */
     private File findFirstLevelFile() {
-        File resources = new File("src/resources");
+        File resources = getLevelResourcesDirectory();
         File[] files = resources.listFiles((dir, name) -> name.toLowerCase().endsWith(".txt"));
         if (files == null || files.length == 0) {
             return null;
@@ -220,7 +215,6 @@ public class MainWindow extends JFrame implements MenuContext {
 
         levelCompletedScreenVisible = true;
         SwingUtilities.invokeLater(() -> {
-            gamePanel.clearPressedKeys();
             changeState(new LevelCompletedState());
         });
     } // Cierre del método
@@ -235,7 +229,6 @@ public class MainWindow extends JFrame implements MenuContext {
 
         timeExpiredScreenVisible = true;
         SwingUtilities.invokeLater(() -> {
-            gamePanel.clearPressedKeys();
             JOptionPane.showMessageDialog(this,
                     "Se acabó el tiempo, has perdido :(",
                     "Tiempo agotado",
@@ -261,8 +254,35 @@ public class MainWindow extends JFrame implements MenuContext {
         }
 
         game.pauseGame();
-        gamePanel.clearPressedKeys();
         changeState(new PauseMenuState());
+    } // Cierre del método
+
+    @Override
+    public void saveGame() {
+        JFileChooser chooser = new JFileChooser(new File("."));
+        chooser.setDialogTitle("Guardar partida");
+        chooser.setSelectedFile(new File("partida.txt"));
+        int result = chooser.showSaveDialog(this);
+
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        try {
+            game.saveGame(chooser.getSelectedFile());
+
+            JOptionPane.showMessageDialog(this,
+                    "Partida guardada correctamente.",
+                    "Guardado",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (TheDopoHardestGameException exception) {
+
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo guardar la partida: " + exception.getMessage(),
+                    "Error de guardado",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     } // Cierre del método
 
     /**
@@ -283,7 +303,6 @@ public class MainWindow extends JFrame implements MenuContext {
     @Override
     public void returnToMainMenu() {
         game.endGame();
-        gamePanel.clearPressedKeys();
         changeState(new ModeSelectionState());
     } // Cierre del método
 
@@ -308,17 +327,31 @@ public class MainWindow extends JFrame implements MenuContext {
         if (result != JFileChooser.APPROVE_OPTION) {
             return;
         }
+        System.out.println("INICIO loadSavedGame");
 
         try {
             File selectedFile = chooser.getSelectedFile();
-            game.loadLevel(selectedFile);
-            startSelectedGame();
-        } catch (TheDopoHardestGameException | IOException | ClassNotFoundException exception) {
+            GameMemento memento = game.loadLevel(selectedFile);
+            menuData.setSelectedMode(memento.getMode());
+            menuData.setSelectedSkin(memento.getSkin());
+            menuData.setSelectedBorderColor(memento.getBorderColor());
+            menuData.setSecondSelectedSkin(memento.getSecondSkin());
+            menuData.setSelectedSecondBorderColor(memento.getSecondBorderColor());
+            menuData.setSelectedLevelFile(memento.getLevelFile());
+            pendingSavedGame = memento;
+        } catch (TheDopoHardestGameException exception) {
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo cargar la partida: " + exception.getMessage(),
+                    "Error de carga",
+                    JOptionPane.ERROR_MESSAGE);
+            TheDopoHardestGameLogger.getInstance().logException(exception);
+        } catch (IOException | ClassNotFoundException exception) {
             JOptionPane.showMessageDialog(this,
                     "No se pudo cargar la partida: " + exception.getMessage(),
                     "Error de carga",
                     JOptionPane.ERROR_MESSAGE);
         }
+        startSelectedGame();
     } // Cierre del método
 
     /**
@@ -330,4 +363,18 @@ public class MainWindow extends JFrame implements MenuContext {
     public TheDopoHardestGame getGame() {
         return game;
     } // Cierre del método
+
+    public GamePanel getGamePanel() {
+        return gamePanel;
+    } // Cierre del método
+
+    private File getLevelResourcesDirectory() {
+        File sourceResources = new File("src/resources");
+
+        if (sourceResources.isDirectory()) {
+            return sourceResources;
+        }
+
+        return new File("resources");
+    }
 } // Cierre de la clase

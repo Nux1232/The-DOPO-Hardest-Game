@@ -2,6 +2,10 @@ package domain.save.memento;
 
 import java.awt.Color;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.Properties;
 
 /**
@@ -10,7 +14,7 @@ import java.util.Properties;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 09/05/2026
+ * @version 16/05/2026
  */
 public class GameCaretaker {
     private GameMemento lastMemento;
@@ -91,7 +95,11 @@ public class GameCaretaker {
         String skin = properties.getProperty("skin", "BLINKY");
         Color borderColor = parseColor(properties.getProperty("borderColor", "YELLOW"));
         File levelFile = new File(properties.getProperty("levelFile", "src/resources/configuration1.txt"));
-        return new GameMemento(mode, skin, borderColor, levelFile);
+        String secondSkin = properties.getProperty("secondSkin", "BLINKY");
+        Color secondBorderColor = parseColor(properties.getProperty("secondBorderColor", "BLACK"));
+        int remainingTime = parseInt(properties.getProperty("remainingTime"), -1);
+        List<GameMemento.PlayerSnapshot> snapshots = loadPlayerSnapshots(properties);
+        return new GameMemento(mode, skin, borderColor, secondSkin, secondBorderColor, levelFile, remainingTime, snapshots);
     } // Cierre del método
 
     /**
@@ -107,10 +115,109 @@ public class GameCaretaker {
         properties.setProperty("skin", memento.getSkin());
         properties.setProperty("borderColor", colorName(memento.getBorderColor()));
         properties.setProperty("levelFile", memento.getLevelFile().getPath());
+        properties.setProperty("secondSkin", memento.getSecondSkin());
+        properties.setProperty("secondBorderColor", colorName(memento.getSecondBorderColor()));
+        properties.setProperty("remainingTime", String.valueOf(memento.getRemainingTime()));
+        properties.setProperty("playerCount", String.valueOf(memento.getPlayerSnapshots().size()));
+        for (int i = 0; i < memento.getPlayerSnapshots().size(); i++) {
+            savePlayerSnapshot(
+                    properties,
+                    "player" + i + ".",
+                    memento.getPlayerSnapshots().get(i)
+            );
+        }
         try (FileOutputStream output = new FileOutputStream(file)) {
             properties.store(output, "The DOPO Hardest Game save");
         }
     } // Cierre del método
+
+    private void savePlayerSnapshot(Properties properties,
+                                    String prefix,
+                                    GameMemento.PlayerSnapshot snapshot) {
+
+        properties.setProperty(prefix + "skin", snapshot.getSkin());
+        properties.setProperty(prefix + "borderColor",
+                colorName(snapshot.getBorderColor()));
+
+        properties.setProperty(prefix + "x",
+                String.valueOf(snapshot.getX()));
+
+        properties.setProperty(prefix + "y",
+                String.valueOf(snapshot.getY()));
+
+        properties.setProperty(prefix + "speed",
+                String.valueOf(snapshot.getCurrentSpeed()));
+
+        properties.setProperty(prefix + "size",
+                String.valueOf(snapshot.getSizeMultiplier()));
+
+        properties.setProperty(prefix + "respawnX",
+                String.valueOf(snapshot.getRespawnX()));
+
+        properties.setProperty(prefix + "respawnY",
+                String.valueOf(snapshot.getRespawnY()));
+
+        properties.setProperty(prefix + "deaths",
+                String.valueOf(snapshot.getDeaths()));
+
+        properties.setProperty(prefix + "coins",
+                joinIntegers(snapshot.getCollectedCoins()));
+
+        properties.setProperty(prefix + "hasShield",
+                String.valueOf(snapshot.hasShield()));
+
+        properties.setProperty(prefix + "invincible",
+                String.valueOf(snapshot.isInvincible()));
+
+        properties.setProperty(prefix + "invincibilityTimer",
+                String.valueOf(snapshot.getInvincibilityTimer()));
+    }
+
+    private List<GameMemento.PlayerSnapshot> loadPlayerSnapshots(Properties properties) {
+
+        int playerCount = parseInt(properties.getProperty("playerCount"), 0);
+
+        List<GameMemento.PlayerSnapshot> snapshots = new ArrayList<>();
+
+        for (int i = 0; i < playerCount; i++) {
+
+            String prefix = "player" + i + ".";
+
+            snapshots.add(new GameMemento.PlayerSnapshot(
+                    properties.getProperty(prefix + "skin", "BLINKY"),
+
+                    parseColor(properties.getProperty(
+                            prefix + "borderColor", "BLACK")),
+
+                    parseDouble(properties.getProperty(prefix + "x"), 0),
+
+                    parseDouble(properties.getProperty(prefix + "y"), 0),
+
+                    parseDouble(properties.getProperty(prefix + "speed"), 1.25),
+
+                    parseDouble(properties.getProperty(prefix + "size"), 1.0),
+
+                    parseDouble(properties.getProperty(prefix + "respawnX"), 0),
+
+                    parseDouble(properties.getProperty(prefix + "respawnY"), 0),
+
+                    parseInt(properties.getProperty(prefix + "deaths"), 0),
+
+                    parseIntegerSet(properties.getProperty(prefix + "coins", "")),
+
+                    Boolean.parseBoolean(properties.getProperty(
+                            prefix + "hasShield", "false")),
+
+                    Boolean.parseBoolean(properties.getProperty(
+                            prefix + "invincible", "false")),
+
+                    parseInt(properties.getProperty(
+                            prefix + "invincibilityTimer"), 0)
+            ));
+        }
+
+        return snapshots;
+    }
 
     /**
      * Método que permite cambiar un color.
@@ -165,4 +272,63 @@ public class GameCaretaker {
     public GameMemento getLastMemento() {
         return lastMemento;
     } // Cierre del método
+
+    private String joinIntegers(Set<Integer> values) {
+
+        StringBuilder builder = new StringBuilder();
+
+        boolean first = true;
+
+        for (Integer value : values) {
+
+            if (!first) {
+                builder.append(",");
+            }
+
+            builder.append(value);
+
+            first = false;
+        }
+
+        return builder.toString();
+    }
+
+    private Set<Integer> parseIntegerSet(String value) {
+
+        Set<Integer> result = new HashSet<>();
+
+        if (value == null || value.trim().isEmpty()) {
+            return result;
+        }
+
+        for (String part : value.split(",")) {
+            result.add(parseInt(part.trim(), 0));
+        }
+
+        return result;
+    }
+
+    private int parseInt(String value, int defaultValue) {
+
+        try {
+            return value == null
+                    ? defaultValue
+                    : Integer.parseInt(value);
+
+        } catch (NumberFormatException exception) {
+            return defaultValue;
+        }
+    }
+
+    private double parseDouble(String value, double defaultValue) {
+
+        try {
+            return value == null
+                    ? defaultValue
+                    : Double.parseDouble(value);
+
+        } catch (NumberFormatException exception) {
+            return defaultValue;
+        }
+    }
 } // Cierre de la clase

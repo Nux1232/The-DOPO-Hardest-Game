@@ -8,7 +8,6 @@ import domain.level.GameConfiguration;
 import domain.level.Level;
 import domain.save.memento.GameCaretaker;
 import domain.save.memento.GameMemento;
-import presentation.ui.observer.GameObserver;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +19,7 @@ import java.util.List;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 09/05/2026
+ * @version 16/05/2026
  */
 
 public class TheDopoHardestGame {
@@ -40,17 +39,62 @@ public class TheDopoHardestGame {
         this.currentConfigurationIndex = 0;
     } // Cierre del constructor
 
+    /**
+     * Método que permite iniciar el juego.
+     * @param configuration El nivel que se va a jugar.
+     * @throws TheDopoHardestGameException La excepción a lanzar.
+     */
     public void startGame(GameConfiguration configuration) throws TheDopoHardestGameException {
+        startGame(configuration, currentLevelFile);
+    } // Cierre del método
+
+    /**
+     * Método que permite iniciar el juego.
+     * @param configuration El nivel que se va a jugar.
+     * @param levelFile El archivo del nivel que se va a jugar.
+     * @throws TheDopoHardestGameException La excepción a lanzar.
+     */
+    public void startGame(GameConfiguration configuration, File levelFile)
+            throws TheDopoHardestGameException {
+        startGame(configuration, levelFile, null);
+    } // Cierre del método
+
+    /**
+     * Método que permite iniciar el juego.
+     *
+     * @param configuration El nivel que se va a jugar.
+     * @param levelFile El archivo del nivel que se va a jugar.
+     * @param memento El estado del juego.
+     * @throws TheDopoHardestGameException La excepción a lanzar si no hay jugadores.
+     */
+    public void startGame(GameConfiguration configuration, File levelFile, GameMemento memento)
+            throws TheDopoHardestGameException {
+
         if(engine.getPlayers().isEmpty()) {
             throw new TheDopoHardestGameException(TheDopoHardestGameException.NO_PLAYERS);
         }
 
         engine.stopGame();
+
+        this.currentLevelFile = levelFile;
+        engine.setCurrentLevelFile(levelFile);
+
+        if(memento != null) {
+            engine.setGameMode(memento.getMode());
+        }
+
         Level level = configuration.buildLevel(currentConfigurationIndex + 1);
+
         if(level == null) {
             throw new TheDopoHardestGameException(TheDopoHardestGameException.LEVEL_LOAD_ERROR);
         }
+
         engine.loadLevel(level);
+
+        if(memento != null) {
+            engine.restoreMemento(memento);
+        }
+
         engine.startGame();
     } // Cierre del método
 
@@ -71,16 +115,27 @@ public class TheDopoHardestGame {
     /**
      * Método que permite guardar el estado del juego.
      *
-     * @param currentLevel El nivel actual que se esta jugando.
+     * @param saveFile El nivel a ser guardado.
      */
-    public void saveGame(File currentLevel) throws TheDopoHardestGameException {
-        if(currentLevel == null) {
+    public void saveGame(File saveFile) throws TheDopoHardestGameException {
+        if(saveFile == null || currentLevelFile == null) {
             throw new TheDopoHardestGameException(TheDopoHardestGameException.SAVE_GAME_ERROR);
         }
-        engine.setCurrentLevelFile(currentLevel);
+
+        engine.setCurrentLevelFile(currentLevelFile);
+
         GameMemento memento = engine.createMemento();
-        caretaker.saveMemento(memento);
-    } // Cierre del método
+
+        try {
+            caretaker.save(saveFile, memento);
+            caretaker.saveMemento(memento);
+        } catch (IOException exception) {
+            throw new TheDopoHardestGameException(
+                    TheDopoHardestGameException.SAVE_GAME_ERROR
+                            + ": "
+                            + exception.getMessage());
+        }
+    }// Cierre del método
 
     /**
      * Método que permite finalizar el juego.
@@ -88,20 +143,6 @@ public class TheDopoHardestGame {
     public void endGame() {
         engine.stopGame();
         engine.returnToMenu();
-    } // Cierre del método
-
-    /**
-     * Método que permite ir al siguiente nivel.
-     *
-     * @param nextConfiguration El siguiente nivel que se va a jugar.
-     */
-    public void nextLevel(GameConfiguration nextConfiguration) throws TheDopoHardestGameException {
-        if(nextConfiguration == null) {
-            throw new TheDopoHardestGameException(TheDopoHardestGameException.LOAD_GAME_ERROR);
-        }
-        currentConfigurationIndex++;
-        engine.getPlayers().forEach(Player::resetCoins);
-        startGame(nextConfiguration);
     } // Cierre del método
 
     /**
@@ -148,17 +189,32 @@ public class TheDopoHardestGame {
     /**
      * Método que permite cargar un nivel guardado.
      *
-     * @param configuration El nivel que se va a jugar.
+     * @param saveFile El nivel guardado que se va a jugar.
      * @throws Exception La excepción que se lanza por si no se encuentra el archivo.
      */
-    public void loadLevel(File configuration) throws TheDopoHardestGameException, IOException, ClassNotFoundException {
-        if(configuration == null) {
-            throw new TheDopoHardestGameException(TheDopoHardestGameException.LEVEL_LOAD_ERROR);
+    public GameMemento loadLevel(File saveFile)
+            throws TheDopoHardestGameException, IOException, ClassNotFoundException {
+
+        if(saveFile == null) {
+            throw new TheDopoHardestGameException(
+                    TheDopoHardestGameException.LOAD_GAME_ERROR);
         }
 
-        GameMemento memento = caretaker.load(configuration);
-        if(memento != null) {
-            engine.restoreMemento(memento);
+        try {
+            GameMemento memento = caretaker.load(saveFile);
+            caretaker.saveMemento(memento);
+            return memento;
+
+        } catch (IOException | ClassNotFoundException exception) {
+
+            throw exception;
+
+        } catch (Exception exception) {
+
+            throw new TheDopoHardestGameException(
+                    TheDopoHardestGameException.LOAD_GAME_ERROR
+                            + ": "
+                            + exception.getMessage());
         }
     } // Cierre del método
 
@@ -169,24 +225,6 @@ public class TheDopoHardestGame {
      */
     public void addObserver(GameObserver observer) {
         engine.addObserver(observer);
-    } // Cierre del método
-
-    /**
-     * Método que verifica si el juego está pausado.
-     *
-     * @return boolean Rectifica si está en pausa o no.
-     */
-    public boolean isGamePaused() {
-        return engine.getCurrentState() == GameState.PAUSED;
-    } // Cierre del método
-
-    /**
-     * Método que verifica si el juego ha terminado.
-     *
-     * @return boolean Rectifica si ha terminado o no.
-     */
-    public boolean isGameWon() {
-        return engine.getCurrentState() == GameState.VICTORY;
     } // Cierre del método
 
     /**

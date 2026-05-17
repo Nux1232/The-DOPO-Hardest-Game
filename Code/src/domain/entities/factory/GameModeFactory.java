@@ -10,8 +10,10 @@ public class GameModeFactory {
         switch(mode.toUpperCase()) {
             case "PVP":
             case "PLAYER VS PLAYER":
+            case "PLAYERVSPLAYER":
                 return new PlayerVsPlayer();
             case "PLAYER":
+            case "SINGLEPLAYER":
             default:
                 return new SinglePlayer();
         }
