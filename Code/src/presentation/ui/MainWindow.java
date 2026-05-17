@@ -42,6 +42,7 @@ public class MainWindow extends JFrame implements MenuContext {
     private MenuData menuData;
     private boolean levelCompletedScreenVisible;
     private boolean timeExpiredScreenVisible;
+    private GameMemento pendingSavedGame;
     private final TheDopoHardestGame game = new TheDopoHardestGame();
     private GameMemento pendingSavedGame;
 
@@ -301,6 +302,30 @@ public class MainWindow extends JFrame implements MenuContext {
      * Método que permite regresar al menu principal.
      */
     @Override
+    public void saveGame() {
+        JFileChooser chooser = new JFileChooser(new File("."));
+        chooser.setDialogTitle("Guardar partida");
+        chooser.setSelectedFile(new File("partida.txt"));
+        int result = chooser.showSaveDialog(this);
+        if (result != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        try {
+            game.saveGame(chooser.getSelectedFile());
+            JOptionPane.showMessageDialog(this,
+                    "Partida guardada correctamente.",
+                    "Guardado",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } catch (TheDopoHardestGameException exception) {
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo guardar la partida: " + exception.getMessage(),
+                    "Error de guardado",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    } // Cierre del metodo
+
+    @Override
     public void returnToMainMenu() {
         game.endGame();
         changeState(new ModeSelectionState());
@@ -331,7 +356,14 @@ public class MainWindow extends JFrame implements MenuContext {
 
         try {
             File selectedFile = chooser.getSelectedFile();
+<<<<<<< HEAD
             GameMemento memento = game.loadLevel(selectedFile);
+=======
+            GameMemento memento = game.loadGame(selectedFile);
+            if (memento == null || memento.getLevelFile() == null) {
+                throw new TheDopoHardestGameException(TheDopoHardestGameException.LOAD_GAME_ERROR);
+            }
+>>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
             menuData.setSelectedMode(memento.getMode());
             menuData.setSelectedSkin(memento.getSkin());
             menuData.setSelectedBorderColor(memento.getBorderColor());
@@ -339,6 +371,7 @@ public class MainWindow extends JFrame implements MenuContext {
             menuData.setSelectedSecondBorderColor(memento.getSecondBorderColor());
             menuData.setSelectedLevelFile(memento.getLevelFile());
             pendingSavedGame = memento;
+<<<<<<< HEAD
         } catch (TheDopoHardestGameException exception) {
             JOptionPane.showMessageDialog(this,
                     "No se pudo cargar la partida: " + exception.getMessage(),
@@ -346,6 +379,11 @@ public class MainWindow extends JFrame implements MenuContext {
                     JOptionPane.ERROR_MESSAGE);
             TheDopoHardestGameLogger.getInstance().logException(exception);
         } catch (IOException | ClassNotFoundException exception) {
+=======
+            startSelectedGame();
+        } catch (TheDopoHardestGameException | IOException | ClassNotFoundException exception) {
+            pendingSavedGame = null;
+>>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
             JOptionPane.showMessageDialog(this,
                     "No se pudo cargar la partida: " + exception.getMessage(),
                     "Error de carga",
@@ -363,6 +401,7 @@ public class MainWindow extends JFrame implements MenuContext {
     public TheDopoHardestGame getGame() {
         return game;
     } // Cierre del método
+<<<<<<< HEAD
 
     public GamePanel getGamePanel() {
         return gamePanel;
@@ -377,4 +416,13 @@ public class MainWindow extends JFrame implements MenuContext {
 
         return new File("resources");
     }
+=======
+    private File getLevelResourcesDirectory() {
+        File sourceResources = new File("src/resources");
+        if (sourceResources.isDirectory()) {
+            return sourceResources;
+        }
+        return new File("resources");
+    } // Cierre del metodo
+>>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
 } // Cierre de la clase

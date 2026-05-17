@@ -356,7 +356,7 @@ public class GameEngine implements Runnable {
     /**
      * Método privado que notifica a los observadores del estado del juego.
      */
-    private void notifyObservers() {
+    private void notifyObservers() {    // revisar metodo cuando halla tiempo
         for (GameObserver o : new ArrayList<>(observers)) o.update();
     } // Cierre del método
 
@@ -385,9 +385,13 @@ public class GameEngine implements Runnable {
     public GameMemento createMemento() {
         Player player = players.isEmpty() ? null : players.get(0);
         Player secondPlayer = players.size() > 1 ? players.get(1) : null;
+<<<<<<< HEAD
 
         List<GameMemento.PlayerSnapshot> playerSnapshots = new ArrayList<>();
 
+=======
+        List<GameMemento.PlayerSnapshot> playerSnapshots = new ArrayList<>();
+>>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
         for (Player currentPlayer : players) {
             playerSnapshots.add(new GameMemento.PlayerSnapshot(
                     currentPlayer.getColor(),
@@ -403,6 +407,7 @@ public class GameEngine implements Runnable {
                     currentPlayer.hasShield(),
                     currentPlayer.isInvincible(),
                     currentPlayer.getInvincibilityTimer()));
+<<<<<<< HEAD
             }
 
         return new GameMemento(
@@ -414,11 +419,23 @@ public class GameEngine implements Runnable {
                 currentLevelFile,
                 remainingTime,
                 playerSnapshots);
+=======
+        }
+        return new GameMemento(getCurrentModeName(),
+                player!= null ? player.getColor() : "RED",
+        player != null ? player.getBorderColor() : Color.BLACK,
+        secondPlayer != null ? secondPlayer.getColor() : "RED",
+        secondPlayer != null ? secondPlayer.getBorderColor() : Color.BLACK,
+        currentLevelFile,
+        remainingTime,
+        playerSnapshots);
+>>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
     } // Cierre del método
 
     public void restoreMemento(GameMemento memento) {
         setGameMode(memento.getMode());
         this.currentLevelFile = memento.getLevelFile();
+<<<<<<< HEAD
 
         if (memento.getRemainingTime() >= 0) {
             this.remainingTime = memento.getRemainingTime();
@@ -449,11 +466,31 @@ public class GameEngine implements Runnable {
                         snapshot.getInvincibilityTimer());
             }
 
+=======
+        if (memento.getRemainingTime() >= 0) {
+            this.remainingTime = memento.getRemainingTime();
+        }
+        List<GameMemento.PlayerSnapshot> snapshots = memento.getPlayerSnapshots();
+        if(!snapshots.isEmpty()) {
+            int amountPlayers = Math.min(players.size(), snapshots.size());
+            for (int i = 0; i < amountPlayers; i++) {
+                Player player = players.get(i);
+                GameMemento.PlayerSnapshot snapshot = snapshots.get(i);
+                player.restoreSavedState(snapshot.getSkin(), snapshot.getBorderColor(),
+                        snapshot.getX(), snapshot.getY(), snapshot.getCurrentSpeed(),
+                        snapshot.getSizeMultiplier(), snapshot.getRespawnX(), snapshot.getRespawnY(),
+                        snapshot.getDeaths(), snapshot.getCollectedCoins(), snapshot.hasShield(),
+                        snapshot.isInvincible(), snapshot.getInvincibilityTimer());
+            }
+>>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
             restoreCollectedCoinsOnLevel();
             gameMode.setUp(players);
             return;
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
         if(!players.isEmpty()) {
             Player player = players.get(0);
 
@@ -464,6 +501,7 @@ public class GameEngine implements Runnable {
 
             player.setBorderColor(memento.getBorderColor());
         }
+<<<<<<< HEAD
 
         if(players.size() > 1) {
             Player secondPlayer = players.get(1);
@@ -502,6 +540,39 @@ public class GameEngine implements Runnable {
                 ? "Player vs Player"
                 : "Player";
     }
+=======
+        if(players.size() > 1) {
+            Player secondPlayer = players.get(1);
+            secondPlayer.applySkin(memento.getSecondSkin(), secondPlayer.getCurrentSpeed(),
+                    secondPlayer.getSizeMultiplier());
+            secondPlayer.setBorderColor(memento.getSecondBorderColor());
+        }
+        gameMode.setUp(players);
+    } // Cierre del método
+>>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
+
+    private void restoreCollectedCoinsOnLevel() {
+        if(currentLevel == null || players.isEmpty()) {
+            return;
+        }
+
+        if(gameMode.independentGameModeCoins()) {
+            return;
+        }
+
+        Player player = players.get(0);
+        for(Integer coinIndex : player.getCollectedCoinIndexes()) {
+            if(coinIndex >= 0 && coinIndex < currentLevel.getCoins().size()) {
+                currentLevel.getCoins().get(coinIndex).collect();
+            }
+        }
+    } // Cierre del metodo
+
+    private String getCurrentModeName() {
+        return gameMode.getClass().getSimpleName().equals("PlayerVsPlayer")
+                ? "Player vs Player"
+                : "Player";
+    } // Cierre del metodo
 
     public void setCurrentLevelFile(File currentLevel) {
         this.currentLevelFile = currentLevel;
