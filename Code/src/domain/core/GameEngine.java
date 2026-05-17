@@ -168,7 +168,7 @@ public class GameEngine implements Runnable {
     /**
      * Método que avanza el reloj del juego un segundo.
      */
-    void advanceGameClockOneSecond() {
+    public void advanceGameClockOneSecond() {
         if (currentState != GameState.PLAYING) return;
         if (remainingTime > 0) {
             remainingTime--;
