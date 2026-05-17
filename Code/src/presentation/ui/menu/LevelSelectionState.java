@@ -44,7 +44,7 @@ public class LevelSelectionState implements MenuScreenState {
 
         for (int i = 0; i < levelFiles.length; i++) {
             File levelFile = levelFiles[i];
-            JToggleButton levelButton = new JToggleButton(levelFile.getName());
+            JToggleButton levelButton = new JToggleButton(formatLevelName(levelFile.getName()));
             levelButton.setPreferredSize(new Dimension(390, 42));
             levelButton.setMaximumSize(new Dimension(390, 42));
             levelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -103,5 +103,21 @@ public class LevelSelectionState implements MenuScreenState {
             return sourceResources;
         }
         return new File("resources");
+    } // Cierre del metodo
+
+    /**
+     * Metodo privado que formatea el nombre del archivo para mostrarlo limpio en el menu.
+     *
+     * @param fileName El nombre del archivo con su extension.
+     * @return String El nombre formateado para la interfaz.
+     */
+    private String formatLevelName(String fileName) {
+        String nameWithoutExt = fileName.replaceFirst("[.][^.]+$", "");
+        if (nameWithoutExt.toLowerCase().startsWith("configuration")) {
+            return nameWithoutExt.toLowerCase().replace("configuration", "Nivel ");
+        } else if (nameWithoutExt.length() > 0) {
+            return nameWithoutExt.substring(0, 1).toUpperCase() + nameWithoutExt.substring(1);
+        }
+        return nameWithoutExt;
     } // Cierre del metodo
 } // Cierre de la clase
