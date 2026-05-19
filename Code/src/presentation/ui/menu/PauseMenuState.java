@@ -34,19 +34,15 @@ public class PauseMenuState implements MenuScreenState {
         JPanel panel = MenuStyles.basePanel();
         JLabel title = MenuStyles.title("Juego pausado");
         JButton resumeButton = MenuStyles.primaryButton("Continuar");
-        JButton saveButton = MenuStyles.secondaryButton("Guardar partida");
         JButton mainMenuButton = MenuStyles.secondaryButton("Volver al menú principal");
 
         resumeButton.addActionListener(event -> context.resumeGame());
-        saveButton.addActionListener(event -> context.saveGame());
         mainMenuButton.addActionListener(event -> context.returnToMainMenu());
 
         panel.add(Box.createVerticalGlue());
         panel.add(title);
         panel.add(Box.createRigidArea(new Dimension(0, 28)));
         panel.add(resumeButton);
-        panel.add(Box.createRigidArea(new Dimension(0, 12)));
-        panel.add(saveButton);
         panel.add(Box.createRigidArea(new Dimension(0, 12)));
         panel.add(mainMenuButton);
         panel.add(Box.createVerticalGlue());

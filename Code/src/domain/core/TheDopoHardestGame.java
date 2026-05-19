@@ -46,7 +46,6 @@ public class TheDopoHardestGame {
      */
     public void startGame(GameConfiguration configuration) throws TheDopoHardestGameException {
         startGame(configuration, currentLevelFile);
-<<<<<<< HEAD
     } // Cierre del método
 
     /**
@@ -71,22 +70,11 @@ public class TheDopoHardestGame {
     public void startGame(GameConfiguration configuration, File levelFile, GameMemento memento)
             throws TheDopoHardestGameException {
 
-=======
-    }
-
-    public void startGame(GameConfiguration configuration, File levelFile) throws TheDopoHardestGameException {
-        startGame(configuration, levelFile, null);
-    }
-
-    public void startGame(GameConfiguration configuration, File levelFile, GameMemento memento)
-            throws TheDopoHardestGameException {
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
         if(engine.getPlayers().isEmpty()) {
             throw new TheDopoHardestGameException(TheDopoHardestGameException.NO_PLAYERS);
         }
 
         engine.stopGame();
-<<<<<<< HEAD
 
         this.currentLevelFile = levelFile;
         engine.setCurrentLevelFile(levelFile);
@@ -95,13 +83,6 @@ public class TheDopoHardestGame {
             engine.setGameMode(memento.getMode());
         }
 
-=======
-        this.currentLevelFile = levelFile;
-        engine.setCurrentLevelFile(levelFile);
-        if(memento != null) {
-            engine.setGameMode(memento.getMode());
-        }
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
         Level level = configuration.buildLevel(currentConfigurationIndex + 1);
 
         if(level == null) {
@@ -109,17 +90,11 @@ public class TheDopoHardestGame {
         }
 
         engine.loadLevel(level);
-<<<<<<< HEAD
 
         if(memento != null) {
             engine.restoreMemento(memento);
         }
 
-=======
-        if(memento != null) {
-            engine.restoreMemento(memento);
-        }
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
         engine.startGame();
     } // Cierre del método
 
@@ -146,32 +121,21 @@ public class TheDopoHardestGame {
         if(saveFile == null || currentLevelFile == null) {
             throw new TheDopoHardestGameException(TheDopoHardestGameException.SAVE_GAME_ERROR);
         }
-<<<<<<< HEAD
 
         engine.setCurrentLevelFile(currentLevelFile);
 
         GameMemento memento = engine.createMemento();
 
-=======
-        engine.setCurrentLevelFile(currentLevelFile);
-        GameMemento memento = engine.createMemento();
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
         try {
             caretaker.save(saveFile, memento);
             caretaker.saveMemento(memento);
         } catch (IOException exception) {
-<<<<<<< HEAD
             throw new TheDopoHardestGameException(
                     TheDopoHardestGameException.SAVE_GAME_ERROR
                             + ": "
                             + exception.getMessage());
         }
     }// Cierre del método
-=======
-            throw new TheDopoHardestGameException(TheDopoHardestGameException.SAVE_GAME_ERROR + ": " + exception.getMessage());
-        }
-    } // Cierre del método
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
 
     /**
      * Método que permite finalizar el juego.
@@ -228,7 +192,6 @@ public class TheDopoHardestGame {
      * @param saveFile El nivel guardado que se va a jugar.
      * @throws Exception La excepción que se lanza por si no se encuentra el archivo.
      */
-<<<<<<< HEAD
     public GameMemento loadLevel(File saveFile)
             throws TheDopoHardestGameException, IOException, ClassNotFoundException {
 
@@ -252,23 +215,7 @@ public class TheDopoHardestGame {
                     TheDopoHardestGameException.LOAD_GAME_ERROR
                             + ": "
                             + exception.getMessage());
-=======
-    public void loadLevel(File configuration) throws TheDopoHardestGameException, IOException, ClassNotFoundException {
-        loadGame(configuration);
-    }
-
-    public GameMemento loadGame(File configuration) throws TheDopoHardestGameException, IOException, ClassNotFoundException {
-        if(configuration == null) {
-            throw new TheDopoHardestGameException(TheDopoHardestGameException.LEVEL_LOAD_ERROR);
         }
-
-        GameMemento memento = caretaker.load(configuration);
-        if(memento != null) {
-            this.currentLevelFile = memento.getLevelFile();
-            engine.restoreMemento(memento);
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
-        }
-        return memento;
     } // Cierre del método
 
     /**

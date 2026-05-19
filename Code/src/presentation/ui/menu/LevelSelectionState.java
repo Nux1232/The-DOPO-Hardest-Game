@@ -120,8 +120,4 @@ public class LevelSelectionState implements MenuScreenState {
         }
         return nameWithoutExt;
     } // Cierre del metodo
-<<<<<<< HEAD
 } // Cierre de la clase
-=======
-} // Cierre de la clase
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796

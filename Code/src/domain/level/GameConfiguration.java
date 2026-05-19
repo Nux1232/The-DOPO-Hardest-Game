@@ -1,9 +1,7 @@
 package domain.level;
 
-import domain.exceptions.TheDopoHardestGameException;
 import domain.level.builder.ConcreteLevelBuilder;
 import domain.level.builder.LevelBuilder;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import domain.exceptions.TheDopoHardestGameException;
@@ -15,6 +13,7 @@ import domain.exceptions.TheDopoHardestGameException;
  * @author David Felipe Ortiz Salcedo
  * @version 02/05/2026
  */
+
 public class GameConfiguration {
     private final String filePath;
 
@@ -28,7 +27,7 @@ public class GameConfiguration {
     } // Cierre del constructor
 
     /**
-     * Metodo que construye un nivel a partir de su id.
+     * Método que construye un nivel a partir de su id.
      *
      * @param id El identificador de un nivel.
      * @return Level El nivel construido.
@@ -37,21 +36,14 @@ public class GameConfiguration {
         LevelBuilder builder = new ConcreteLevelBuilder();
         builder.reset(id);
 
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath))) {
+        try(BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath))) {
             String line;
-            while ((line = bufferedReader.readLine()) != null) {
+            while((line = bufferedReader.readLine()) != null) {
                 line = line.trim();
-<<<<<<< HEAD
                 if(line.isEmpty() || line.startsWith("#")) continue;
 
                 String[] parts = line.split("\\s+");
                 switch(parts[0].toUpperCase()) {
-=======
-                if (line.isEmpty() || line.startsWith("#")) continue;
-
-                String[] parts = line.split("\\s+");
-                switch (parts[0].toUpperCase()) {
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
                     case "TIME":
                         builder.setTimeLimit(Integer.parseInt(parts[1]));
                         break;
@@ -75,21 +67,12 @@ public class GameConfiguration {
                         builder.addEnemy(parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
                         break;
                     default:
-<<<<<<< HEAD
                         throw new IllegalArgumentException("Configuración desconocida: " + parts[0]);
                 }
             }
         } catch (Exception exception) {
             throw new TheDopoHardestGameException(TheDopoHardestGameException.LEVEL_LOAD_ERROR + ": " + exception.getMessage());
-=======
-                        throw new IllegalArgumentException("Tipo de configuracion desconocido: " + parts[0]);
-                }
-            }
-        } catch (Exception exception) {
-            throw new TheDopoHardestGameException(
-                    TheDopoHardestGameException.LEVEL_LOAD_ERROR + ": " + exception.getMessage());
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
         }
         return builder.build();
-    } // Cierre del metodo
+    } // Cierre del método
 } // Cierre de la clase

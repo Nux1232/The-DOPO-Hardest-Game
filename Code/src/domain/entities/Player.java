@@ -1,7 +1,6 @@
 package domain.entities;
 
 import java.awt.Color;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Collections;
@@ -241,49 +240,6 @@ public abstract class Player {
     public void resetCoins() {
         this.collectedCoinIndex.clear();
     }
-
-    public Set<Integer> getCollectedCoinIndexes() {
-        return Collections.unmodifiableSet(collectedCoinIndex);
-    } // Cierre del metodo
-
-    public double getRespawnX() {
-        return respawnX;
-    } // Cierre del metodo
-
-    public double getRespawnY() {
-        return respawnY;
-    } // Cierre del metodo
-
-    public boolean hasShield() {
-        return hasShield;
-    } // Cierre del metodo
-
-    public int getInvincibilityTimer() {
-        return invincibilityTimer;
-    } // Cierre del metodo
-
-    public void restoreSavedState(String color, Color borderColor, double x, double y,
-                                  double currentSpeed, double sizeMultiplier,
-                                  double respawnX, double respawnY, int deaths,
-                                  Set<Integer> collectedCoins, boolean hasShield,
-                                  boolean isInvincible, int invincibilityTimer) {
-        this.currentColor = color;
-        this.borderColor = borderColor == null ? Color.BLACK : borderColor;
-        this.x = x;
-        this.y = y;
-        this.currentSpeed = currentSpeed;
-        this.sizeMultiplier = sizeMultiplier;
-        this.respawnX = respawnX;
-        this.respawnY = respawnY;
-        this.deaths = deaths;
-        this.collectedCoinIndex.clear();
-        if (collectedCoins != null) {
-            this.collectedCoinIndex.addAll(collectedCoins);
-        }
-        this.hasShield = hasShield;
-        this.isInvincible = isInvincible;
-        this.invincibilityTimer = invincibilityTimer;
-    } // Cierre del metodo
     /**
      * Método que devuelve el nombre del jugador.
      * @return String El nombre del jugador.
