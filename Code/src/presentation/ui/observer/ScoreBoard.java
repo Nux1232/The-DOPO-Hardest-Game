@@ -1,7 +1,6 @@
 package presentation.ui.observer;
 
 import domain.core.GameEngine;
-import domain.core.GameObserver;
 import domain.entities.Player;
 
 /**

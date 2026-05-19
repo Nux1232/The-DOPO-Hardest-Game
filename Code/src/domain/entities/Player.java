@@ -4,14 +4,13 @@ import java.awt.Color;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Collections;
 
 /**
  * Clase abstracta que representa a un jugador.
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 16/05/2026
+ * @version 09/05/2026
  */
 
 public abstract class Player {
@@ -71,6 +70,18 @@ public abstract class Player {
                 x -= s;
                 break;
             case "RIGHT":
+                x += s;
+                break;
+            case "W":
+                y -= s;
+                break;
+            case "S":
+                y += s;
+                break;
+            case "A":
+                x -= s;
+                break;
+            case "D":
                 x += s;
                 break;
         }
@@ -139,45 +150,6 @@ public abstract class Player {
                 isInvincible = false;
             }
         }
-    } // Cierre del método
-
-    public void restoreSavedState(String color, Color borderColor,
-                                  double x, double y,
-                                  double currentSpeed,
-                                  double sizeMultiplier,
-                                  double respawnX, double respawnY,
-                                  int deaths,
-                                  Set<Integer> collectedCoins,
-                                  boolean hasShield,
-                                  boolean isInvincible,
-                                  int invincibilityTimer) {
-
-        this.currentColor = color;
-
-        this.borderColor =
-                borderColor == null ? Color.BLACK : borderColor;
-
-        this.x = x;
-        this.y = y;
-
-        this.currentSpeed = currentSpeed;
-
-        this.sizeMultiplier = sizeMultiplier;
-
-        this.respawnX = respawnX;
-        this.respawnY = respawnY;
-
-        this.deaths = deaths;
-
-        this.collectedCoinIndex.clear();
-
-        if (collectedCoins != null) {
-            this.collectedCoinIndex.addAll(collectedCoins);
-        }
-
-        this.hasShield = hasShield;
-        this.isInvincible = isInvincible;
-        this.invincibilityTimer = invincibilityTimer;
     } // Cierre del método
 
     /**
@@ -371,25 +343,5 @@ public abstract class Player {
      */
     public double getCurrentSpeed() {
         return currentSpeed;
-    } // Cierre del método
-
-    public Set<Integer> getCollectedCoinIndexes() {
-        return Collections.unmodifiableSet(collectedCoinIndex);
-    } // Cierre del método
-
-    public double getRespawnX() {
-        return respawnX;
-    } // Cierre del método
-
-    public double getRespawnY() {
-        return respawnY;
-    } // Cierre del método
-
-    public boolean hasShield() {
-        return hasShield;
-    } // Cierre del método
-
-    public int getInvincibilityTimer() {
-        return invincibilityTimer;
     } // Cierre del método
 } // Cierre de la clase

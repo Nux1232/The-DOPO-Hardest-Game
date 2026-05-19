@@ -7,7 +7,7 @@ import domain.core.TheDopoHardestGame;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 16/05/2026
+ * @version 09/05/2026
  */
 public interface MenuContext {
     MenuData getMenuData();

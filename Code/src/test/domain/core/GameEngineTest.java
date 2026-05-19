@@ -13,11 +13,6 @@ import domain.level.Level;
 import domain.save.memento.GameMemento;
 import presentation.ui.GamePanel;
 
-<<<<<<< HEAD
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
-import static org.junit.jupiter.api.Assertions.*;
-=======
 import domain.core.GameEngine;
 import domain.core.GameState;
 import domain.core.TheDopoHardestGame;
@@ -26,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -280,11 +274,7 @@ public class GameEngineTest {
         game.saveGame(saveFile);
         game.endGame();
 
-<<<<<<< HEAD
-        GameMemento memento = game.loadLevel(saveFile);
-=======
         GameMemento memento = game.loadGame(saveFile);
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
 
         assertTrue(saveFile.length() > 0, "save file should be written to disk");
         assertEquals("Player vs Player", memento.getMode(), "saved mode");
@@ -328,11 +318,7 @@ public class GameEngineTest {
         game.saveGame(saveFile);
         game.endGame();
 
-<<<<<<< HEAD
-        GameMemento memento = game.loadLevel(saveFile);
-=======
         GameMemento memento = game.loadGame(saveFile);
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
         game.clearPlayers();
         Player restoredPlayer = PlayerFactory.createPlayer("Jugador 1", memento.getSkin());
         game.addPlayer(restoredPlayer);
@@ -371,8 +357,4 @@ public class GameEngineTest {
         update.setAccessible(true);
         update.invoke(engine);
     }
-<<<<<<< HEAD
 } // Cierre de la clase
-=======
-} // Cierre de la clase
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796

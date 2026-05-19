@@ -6,7 +6,6 @@ import domain.level.builder.LevelBuilder;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import domain.exceptions.TheDopoHardestGameException;
 
 /**
  * Clase que contiene la configuracion del juego.
@@ -41,17 +40,10 @@ public class GameConfiguration {
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 line = line.trim();
-<<<<<<< HEAD
-                if(line.isEmpty() || line.startsWith("#")) continue;
-
-                String[] parts = line.split("\\s+");
-                switch(parts[0].toUpperCase()) {
-=======
                 if (line.isEmpty() || line.startsWith("#")) continue;
 
                 String[] parts = line.split("\\s+");
                 switch (parts[0].toUpperCase()) {
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
                     case "TIME":
                         builder.setTimeLimit(Integer.parseInt(parts[1]));
                         break;
@@ -75,20 +67,12 @@ public class GameConfiguration {
                         builder.addEnemy(parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
                         break;
                     default:
-<<<<<<< HEAD
-                        throw new IllegalArgumentException("Configuración desconocida: " + parts[0]);
-                }
-            }
-        } catch (Exception exception) {
-            throw new TheDopoHardestGameException(TheDopoHardestGameException.LEVEL_LOAD_ERROR + ": " + exception.getMessage());
-=======
                         throw new IllegalArgumentException("Tipo de configuracion desconocido: " + parts[0]);
                 }
             }
         } catch (Exception exception) {
             throw new TheDopoHardestGameException(
                     TheDopoHardestGameException.LEVEL_LOAD_ERROR + ": " + exception.getMessage());
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796
         }
         return builder.build();
     } // Cierre del metodo

@@ -14,7 +14,7 @@ import java.util.Set;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 16/05/2026
+ * @version 09/05/2026
  */
 public class GameMemento implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -204,8 +204,4 @@ public class GameMemento implements Serializable {
             return invincibilityTimer;
         } // Cierre del metodo
     } // Cierre de la clase interna
-<<<<<<< HEAD
 } // Cierre de la clase
-=======
-} // Cierre de la clase
->>>>>>> 866e39b8af658a9ef8959226695cffba8989a796

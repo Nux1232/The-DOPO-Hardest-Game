@@ -26,17 +26,14 @@ public class PlayerFactory {
             case "INKY":
             case "BLUE":
             case "AZUL":
-            case "BLUE":
                 return new Inky(name);
             case "CLYDE":
             case "GREEN":
             case "VERDE":
-            case "GREEN":
                 return new Clyde(name);
             case "BLINKY":
             case "RED":
             case "ROJO":
-            case "RED":
             default:
                 return new Blinky(name);
         }
