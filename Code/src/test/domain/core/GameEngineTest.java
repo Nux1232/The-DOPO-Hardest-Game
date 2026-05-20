@@ -30,7 +30,7 @@ import java.util.Collections;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 19/05/2026
+ * @version 10/05/2026
  */
 
 public class GameEngineTest {
