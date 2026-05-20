@@ -18,6 +18,7 @@ public class Enemy {
     private MovementStrategy movementStrategy;
     private boolean isAlive = true;
 
+
     /**
      * Constructor de la clase Enemy.
      *
@@ -27,6 +28,7 @@ public class Enemy {
     public Enemy(double x, double y) {
         this.x = x;
         this.y = y;
+
     } // Cierre del constructor
 
     /**
@@ -62,6 +64,7 @@ public class Enemy {
     public boolean isAlive() {
         return isAlive;
     } // Cierre del método
+
 
     /**
      * Método que obtiene la coordenada x del enemigo.

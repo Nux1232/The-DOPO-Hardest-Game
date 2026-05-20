@@ -11,7 +11,7 @@ import domain.exceptions.TheDopoHardestGameException;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 19/05/2026
+ * @version 02/05/2026
  */
 
 public class GameConfiguration {
@@ -31,7 +31,6 @@ public class GameConfiguration {
      *
      * @param id El identificador de un nivel.
      * @return Level El nivel construido.
-     * @throws TheDopoHardestGameException Lanza y atiende una excepcion por si no se sabe el objeto a construir.
      */
     public Level buildLevel(int id) throws TheDopoHardestGameException {
         LevelBuilder builder = new ConcreteLevelBuilder();
@@ -61,15 +60,20 @@ public class GameConfiguration {
                         builder.addWall(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]),
                                 Integer.parseInt(parts[3]), Integer.parseInt(parts[4]));
                         break;
-                    case "BOMB":
-                        builder.addBomb(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
-                        break;
                     case "COIN":
                         builder.addCoin(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), parts[3]);
                         break;
                     case "ENEMY":
                         builder.addEnemy(parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
                         break;
+                    case "LIFESOURCE":
+                        builder.addLifeSource(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+                        break;
+
+                    case "BOMB":
+                        builder.addBomb(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+                        break;
+
                     default:
                         throw new IllegalArgumentException("Configuración desconocida: " + parts[0]);
                 }

@@ -5,7 +5,7 @@ package domain.entities;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 19/05/2026
+ * @version 18/05/2026
  */
 
 public abstract class SpecialElement {
@@ -94,5 +94,4 @@ public abstract class SpecialElement {
     public int getHeight() {
         return height;
     } // Cierre del método
-
 } // Cierre de la clase

@@ -28,6 +28,7 @@ public abstract class Player {
     protected int invincibilityTimer;
     private double respawnX, respawnY;
     private Set<Integer> collectedCoinIndex = new HashSet<>();
+    private int extraLives = 0;
 
     /**
      * Constructor de la clase Player.
@@ -95,8 +96,8 @@ public abstract class Player {
     public void resetToOriginal() {
         this.currentColor = originalColor;
         this.currentSpeed = baseSpeed;
-        this.sizeMultiplier = (originalColor.equalsIgnoreCase("AZUL")) ? 1.5 : 1.0;
-        this.hasShield = false;
+        this.sizeMultiplier = (originalColor.equalsIgnoreCase("AZUL") || originalColor.equalsIgnoreCase("BLUE")) ? 1.5 : 1.0;
+        this.hasShield = originalColor.equalsIgnoreCase("VERDE");
         this.isInvincible = false;
         this.invincibilityTimer = 0;
     } // Cierre del método
@@ -112,20 +113,34 @@ public abstract class Player {
             currentSpeed = baseSpeed * 0.7;
             isInvincible = true;
             invincibilityTimer = 60;
-            } else {
-                die();
-            }
+            System.out.println("¡Escudo roto! Velocidad reducida.");
+        } else if (extraLives > 0) {
+            extraLives--;
+            isInvincible = true;
+            invincibilityTimer = 60;
+            System.out.println("¡Vida extra usada!");
+        } else {
+            die();
+        }
+    } // Cierre del método
+
+    /**
+     * Método que añade una vida extra al jugador.
+     */
+    public void addExtraLife() {
+        this.extraLives++;
     } // Cierre del método
 
     /**
      * Método que permite que un jugador muera.
      */
     protected void die() {
-        System.out.println("Respawn en: x=" + respawnX + " y=" + respawnY);
         deaths++;
         resetToOriginal();
         this.x = respawnX;
         this.y = respawnY;
+        this.isInvincible = true;
+        this.invincibilityTimer = 90;
     } // Cierre del método
 
     /**
@@ -347,5 +362,23 @@ public abstract class Player {
 
     public int getInvincibilityTimer() {
         return invincibilityTimer;
+    } // Cierre del método
+
+    /**
+     * Método que devuelve las vidas extras del jugador.
+     *
+     * @return int Las vidas extras del jugador.
+     */
+    public int getExtraLives() {
+        return extraLives;
+    } // Cierre del método
+
+    /**
+     * Método que reinicia al jugador para el siguiente nivel.
+     * Preserva muertes y vidas extras.
+     */
+    public void resetForNextLevel() {
+        resetToOriginal();
+        this.collectedCoinIndex.clear();
     } // Cierre del método
 } // Cierre de la clase

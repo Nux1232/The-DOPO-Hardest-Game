@@ -7,12 +7,12 @@ import presentation.ui.MainWindow;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 19/05/2026
+ * @version 16/05/2026
  */
 
 public class TheDopoHardestGameGUI {
     public static void main(String[] args) {
         MainWindow window = new MainWindow();
         window.showWindow();
-    } // Cierre del método
+    }
 } // Cierre de la clase

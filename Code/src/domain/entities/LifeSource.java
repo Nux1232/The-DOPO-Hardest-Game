@@ -26,9 +26,14 @@ public class LifeSource extends SpecialElement {
         this.collected = false;
     } // Cierre del constructor
 
-    public void onEntitieContact(Player player, Enemy enemy) {
+    public void onPlayerContact(Player player) {
 
     } // Cierre del método
+
+    @Override
+    public void onEnemyContact(Enemy enemy) {
+
+    }
 
     /**
      * Método que retorna la coordenada x de la fuente de vida.
