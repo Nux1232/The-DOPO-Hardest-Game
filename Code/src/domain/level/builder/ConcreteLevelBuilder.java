@@ -3,6 +3,7 @@ package domain.level.builder;
 import domain.level.Level;
 import domain.entities.factory.EnemyFactory;
 import domain.entities.Coin;
+import domain.entities.LifeSource;
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -97,6 +98,19 @@ public class ConcreteLevelBuilder implements LevelBuilder {
     @Override
     public LevelBuilder addCoin(int x, int y, String type) {
         level.addCoin(new Coin(x, y, type)); 
+        return this;
+    } // Cierre del método
+
+    /**
+     * Método que añade una fuente de vida al nivel con su propio comportamiento.
+     *
+     * @param x La coordenada x de la fuente de vida.
+     * @param y La coordenada y de la fuente de vida.
+     * @return LevelBuilder El nivel construido.
+     */
+    @Override
+    public LevelBuilder addLifeSource(int x, int y) {
+        level.addLifeSource(new LifeSource(x, y));
         return this;
     } // Cierre del método
 

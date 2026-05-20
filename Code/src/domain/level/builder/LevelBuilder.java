@@ -17,6 +17,7 @@ public interface LevelBuilder {
     LevelBuilder addSafeZone(int x, int y, boolean isFinal);
     LevelBuilder addEnemy(String type, int x, int y);
     LevelBuilder addCoin(int x, int y, String type);
+    LevelBuilder addLifeSource(int x, int y);
     LevelBuilder addWall(int x, int y, int width, int height);
     Level build();
 } // Cierre de la interfaz

@@ -14,8 +14,6 @@ import presentation.ui.menu.MenuScreenState;
 import presentation.ui.menu.ModeSelectionState;
 import presentation.ui.menu.LevelCompletedState;
 import presentation.ui.menu.PauseMenuState;
-import presentation.ui.observer.ScoreBoard;
-import presentation.ui.observer.TimerDisplay;
 import domain.save.memento.GameCaretaker;
 import domain.save.memento.GameMemento;
 
@@ -33,8 +31,6 @@ import java.io.IOException;
  */
 public class MainWindow extends JFrame implements MenuContext {
     private GamePanel gamePanel;
-    private ScoreBoard scoreBoard;
-    private TimerDisplay timerDisplay;
     private JPanel rootPanel;
     private JPanel menuPanel;
     private CardLayout rootLayout;
@@ -59,8 +55,6 @@ public class MainWindow extends JFrame implements MenuContext {
 
         this.gamePanel = new GamePanel(game);
         this.gamePanel.setPauseAction(this::showPauseMenu);
-        this.scoreBoard = new ScoreBoard();
-        this.timerDisplay = new TimerDisplay();
 
         rootPanel.add(menuPanel, "menu");
         rootPanel.add(gamePanel, "game");
@@ -68,8 +62,6 @@ public class MainWindow extends JFrame implements MenuContext {
         changeState(new ModeSelectionState());
 
         // Registrar observadores
-        game.addObserver(scoreBoard);
-        game.addObserver(timerDisplay);
         game.addObserver(this::showLevelCompletedIfNeeded);
         game.addObserver(this::showTimeExpiredIfNeeded);
     } // Cierre del constructor
@@ -163,8 +155,26 @@ public class MainWindow extends JFrame implements MenuContext {
             return;
         }
 
-        menuData.setSelectedLevelFile(nextLevelFile);
-        startSelectedGame();
+        try {
+            menuData.setSelectedLevelFile(nextLevelFile);
+            // Resetear jugadores para el siguiente nivel sin recrearlos
+            for (Player p : game.getPlayers()) {
+                p.resetForNextLevel();
+            }
+            GameConfiguration configuration = new GameConfiguration(nextLevelFile.getPath());
+            levelCompletedScreenVisible = false;
+            timeExpiredScreenVisible = false;
+            game.startGame(configuration, nextLevelFile, pendingSavedGame);
+            pendingSavedGame = null;
+
+            rootLayout.show(rootPanel, "game");
+            SwingUtilities.invokeLater(() -> gamePanel.requestFocusInWindow());
+        } catch (TheDopoHardestGameException e) {
+            pendingSavedGame = null;
+            JOptionPane.showMessageDialog(this, "Error al iniciar el nivel: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            TheDopoHardestGameLogger.getInstance().logException(e);
+        }
     } // Cierre del método
 
     /**

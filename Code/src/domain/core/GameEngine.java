@@ -8,6 +8,7 @@ import java.util.List;
 import domain.entities.Player;
 import domain.entities.Enemy;
 import domain.entities.Coin;
+import domain.entities.LifeSource;
 import domain.level.Level;
 import domain.entities.factory.GameModeFactory;
 import domain.entities.strategy.GameModeStrategy;
@@ -35,7 +36,6 @@ public class GameEngine implements Runnable {
     private List<GameObserver> observers = new ArrayList<>();
     private GameModeStrategy gameMode = GameModeFactory.createGameMode("Player");
     private int remainingTime = 180;
-    private long lastSecondTime;
     private File currentLevelFile;
 
     /**
@@ -128,20 +128,28 @@ public class GameEngine implements Runnable {
     @Override
     public void run() {
         long lastTime = System.nanoTime();
-        lastSecondTime = System.currentTimeMillis();
+        long lastSecondTime = System.nanoTime();
+        long delta = 0;
 
         while (running) {
             long now = System.nanoTime();
-            if (now - lastTime >= TARGET_TIME) {
+            delta += (now - lastTime);
+            lastTime = now;
+
+            boolean updated = false;
+            while (delta >= TARGET_TIME) {
                 update();
-                notifyObservers();
-                lastTime = now;
+                delta -= TARGET_TIME;
+                updated = true;
             }
 
-            if (System.currentTimeMillis() - lastSecondTime >= 1000) {
-                advanceGameClockOneSecond();
+            if (updated) {
                 notifyObservers();
-                lastSecondTime = System.currentTimeMillis();
+            }
+
+            if (now - lastSecondTime >= 1_000_000_000L) {
+                advanceGameClockOneSecond();
+                lastSecondTime += 1_000_000_000L;
             }
 
             try { Thread.sleep(1); } catch (Exception e) {}
@@ -160,6 +168,7 @@ public class GameEngine implements Runnable {
         checkCollisions();
         checkPlayersCollisions();
         checkCoinCollection();
+        checkLifeSourceCollection();
         checkIntermediateZone();
         checkLevelCompletion();
     } // Cierre del método
@@ -263,6 +272,25 @@ public class GameEngine implements Runnable {
             checkCoinCollectionPvPGameMode();
         } else {
             checkCoinCollectionSinglePlayerGameMode();
+        }
+    } // Cierre del método
+
+    /**
+     * Método privado que verifica si el jugador obtuvo una fuente de vida.
+     */
+    private void checkLifeSourceCollection() {
+        List<LifeSource> lifeSources = currentLevel.getLifeSources();
+        if (lifeSources == null) return;
+
+        for (Player p : players) {
+            Rectangle2D.Double pRect = new Rectangle2D.Double(p.getX(), p.getY(),
+                    20 * p.getSizeMultiplier(), 20 * p.getSizeMultiplier());
+            for (LifeSource ls : lifeSources) {
+                if (!ls.isCollected() && pRect.intersects(ls.getX(), ls.getY(), 20, 20)) {
+                    ls.collect();
+                    p.addExtraLife();
+                }
+            }
         }
     } // Cierre del método
 

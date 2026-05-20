@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import domain.entities.Enemy;
 import domain.entities.Coin;
+import domain.entities.LifeSource;
 
 /**
  * Clase que representa un nivel del juego.
@@ -19,6 +20,7 @@ public class Level {
     private int timeLimit;
     private List<Enemy> enemies;
     private List<Coin> coins;
+    private List<LifeSource> lifeSources;
     private List<Rectangle> walls;
     private Point startPoint;
     private Point intermediateSafeZone;
@@ -33,6 +35,7 @@ public class Level {
         this.id = id;
         this.enemies = new ArrayList<>();
         this.coins = new ArrayList<>();
+        this.lifeSources = new ArrayList<>();
         this.walls = new ArrayList<>();
         this.timeLimit = 180; // 3 minutos
     } // Cierre del constructor
@@ -92,6 +95,15 @@ public class Level {
     } // Cierre del método
 
     /**
+     * Método que añade una fuente de vida al nivel.
+     *
+     * @param ls La fuente de vida.
+     */
+    public void addLifeSource(LifeSource ls) {
+        this.lifeSources.add(ls);
+    } // Cierre del método
+
+    /**
      * Método que añade una pared al nivel.
      *
      * @param r Un rectángulo que representa la pared.
@@ -134,6 +146,15 @@ public class Level {
      */
     public List<Coin> getCoins() {
         return coins;
+    } // Cierre del método
+
+    /**
+     * Método que obtiene la lista de fuentes de vida de un nivel.
+     *
+     * @return List<LifeSource> La lista de fuentes de vida del nivel.
+     */
+    public List<LifeSource> getLifeSources() {
+        return lifeSources;
     } // Cierre del método
 
     /**

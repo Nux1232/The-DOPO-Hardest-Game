@@ -66,6 +66,9 @@ public class GameConfiguration {
                     case "ENEMY":
                         builder.addEnemy(parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
                         break;
+                    case "LIFESOURCE":
+                        builder.addLifeSource(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+                        break;
                     default:
                         throw new IllegalArgumentException("Configuración desconocida: " + parts[0]);
                 }

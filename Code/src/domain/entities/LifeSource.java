@@ -19,8 +19,10 @@ public class LifeSource extends SpecialElement {
      * @param x La coordenada x donde se encuentra la fuente de vida.
      * @param y La coordenada y donde se encuentra la fuente de vida.
      */
-    public LifeSource(double x, double y, int width, int height, String color) {
-        super(x, y, 20, 20, "BLUE");
+    public LifeSource(double x, double y) {
+        super(x, y, 20, 20, "MAGENTA");
+        this.x = x;
+        this.y = y;
         this.collected = false;
     } // Cierre del constructor
 
