@@ -146,6 +146,38 @@ public class TheDopoHardestGame {
     } // Cierre del método
 
     /**
+     * Método que permite ir al siguiente nivel.
+     *
+     * @param nextConfiguration El siguiente nivel que se va a jugar.
+     */
+    public void nextLevel(GameConfiguration nextConfiguration) throws TheDopoHardestGameException {
+        if(nextConfiguration == null) {
+            throw new TheDopoHardestGameException(TheDopoHardestGameException.LOAD_GAME_ERROR);
+        }
+        currentConfigurationIndex++;
+        engine.getPlayers().forEach(Player::resetCoins);
+        startGame(nextConfiguration);
+    } // Cierre del método
+
+    /**
+     * Método que verifica si el juego está pausado.
+     *
+     * @return boolean Rectifica si está en pausa o no.
+     */
+    public boolean isGamePaused() {
+        return engine.getCurrentState() == GameState.PAUSED;
+    } // Cierre del método
+
+    /**
+     * Método que verifica si el juego ha terminado.
+     *
+     * @return boolean Rectifica si ha terminado o no.
+     */
+    public boolean isGameWon() {
+        return engine.getCurrentState() == GameState.VICTORY;
+    } // Cierre del método
+
+    /**
      * Método que permite añadir un jugador al juego.
      *
      * @param player El jugador a añadir.
