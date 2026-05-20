@@ -122,6 +122,16 @@ public class GamePanel extends JPanel implements GameObserver {
             g2.fillRect(wall.x, wall.y, wall.width, wall.height);
         }
 
+        //Bomba
+        if(game.getCurrentLevel() != null) {
+            for(Bomb bomb : game.getCurrentLevel().getBombs()) {
+                if(!bomb.isActive()) continue;
+                g2.setColor(Color.BLACK);
+                g2.fillOval((int)bomb.getX() - radius/2, (int)bomb.getY() - radius/2, radius, radius);
+                g2.drawOval((int)bomb.getX() - radius/2, (int)bomb.getY() - radius/2, radius, radius);
+            }
+        }
+
         // Punto de inicio
         Point startPoint = game.getCurrentLevel().getStartPoint();
         if(startPoint != null) {
@@ -164,36 +174,18 @@ public class GamePanel extends JPanel implements GameObserver {
                 }
             }
         }
-        // Fuente de vida (corazón)
-        if (game.getCurrentLevel() != null) {
-            for (LifeSource ls : level.getLifeSources()) {
-                if (!ls.isCollected()) {
-                    g2.setColor(Color.MAGENTA);
-                    int hx = (int)ls.getX();
-                    int hy = (int)ls.getY();
-                    int size = 20;
-                    g2.fillArc(hx, hy, size/2, size/2, 0, 180);
-                    g2.fillArc(hx + size/2, hy, size/2, size/2, 0, 180);
-                    int[] xPts = {hx, hx + size, hx + size/2};
-                    int[] yPts = {hy + size/4, hy + size/4, hy + size};
-                    g2.fillPolygon(xPts, yPts, 3);
-                }
-            }
-        }
+
         // Enemigo
         g2.setColor(Color.BLUE);
         if (game.getCurrentLevel() != null) {
             for (Enemy e : game.getCurrentLevel().getEnemies()) {
+                if(!e.isAlive()) continue;
                 g2.fillOval((int)e.getX() - diameter/2, (int)e.getY() - diameter/2, diameter, diameter);
             }
         }
 
         // Jugador
         for (Player p : game.getPlayers()) {
-            // Parpadeo durante invencibilidad
-            if (p.isInvincible() && (p.getInvincibilityTimer() / 5) % 2 == 0) {
-                continue; // No dibujar en frames alternos para efecto de parpadeo
-            }
             g2.setColor(parsePlayerColor(p.getColor()));
             int size = (int)(20 * p.getSizeMultiplier());
             g2.fillRect((int)p.getX(), (int)p.getY(), size, size);
@@ -249,8 +241,7 @@ public class GamePanel extends JPanel implements GameObserver {
             String playerName = "Jugador 1";
             String firstPlayerCoinText = "Monedas: " + firstPlayer.getCollectedCoins() + "/" + game.getTotalCoins();
             String deathsFirstPlayerText = "Muertes: " + firstPlayer.getDeaths();
-            String livesFirstPlayerText = "Vidas: " + firstPlayer.getExtraLives();
-            drawHudBox(g2, new String[]{playerName, firstPlayerCoinText, deathsFirstPlayerText, livesFirstPlayerText},
+            drawHudBox(g2, new String[]{playerName, firstPlayerCoinText, deathsFirstPlayerText},
                     margin, margin);
         }
 
@@ -259,8 +250,7 @@ public class GamePanel extends JPanel implements GameObserver {
             String playerName = "Jugador 2";
             String coinsSecondPlayerText = "Monedas: " + secondPlayer.getCollectedCoins() + "/" + game.getTotalCoins();
             String deathsSecondPlayerText = "Muertes: " + secondPlayer.getDeaths();
-            String livesSecondPlayerText = "Vidas: " + secondPlayer.getExtraLives();
-            String[] secondPlayerLines = new String[]{playerName, coinsSecondPlayerText, deathsSecondPlayerText, livesSecondPlayerText};
+            String[] secondPlayerLines = new String[]{playerName, coinsSecondPlayerText, deathsSecondPlayerText};
             Dimension secondPlayerSize = getHudBoxSize(g2, secondPlayerLines);
             int secondPlayerX = Math.max(margin, getWidth() - secondPlayerSize.width - margin);
             drawHudBox(g2, secondPlayerLines, secondPlayerX, margin);

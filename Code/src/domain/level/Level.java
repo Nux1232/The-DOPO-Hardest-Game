@@ -3,16 +3,17 @@ package domain.level;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import domain.entities.Bomb;
 import domain.entities.Enemy;
 import domain.entities.Coin;
-import domain.entities.LifeSource;
 
 /**
  * Clase que representa un nivel del juego.
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 09/05/2026
+ * @version 19/05/2026
  */
 
 public class Level {
@@ -20,7 +21,7 @@ public class Level {
     private int timeLimit;
     private List<Enemy> enemies;
     private List<Coin> coins;
-    private List<LifeSource> lifeSources;
+    private List<Bomb> bombs;
     private List<Rectangle> walls;
     private Point startPoint;
     private Point intermediateSafeZone;
@@ -35,8 +36,8 @@ public class Level {
         this.id = id;
         this.enemies = new ArrayList<>();
         this.coins = new ArrayList<>();
-        this.lifeSources = new ArrayList<>();
         this.walls = new ArrayList<>();
+        this.bombs = new ArrayList<>();
         this.timeLimit = 180; // 3 minutos
     } // Cierre del constructor
 
@@ -95,15 +96,6 @@ public class Level {
     } // Cierre del método
 
     /**
-     * Método que añade una fuente de vida al nivel.
-     *
-     * @param ls La fuente de vida.
-     */
-    public void addLifeSource(LifeSource ls) {
-        this.lifeSources.add(ls);
-    } // Cierre del método
-
-    /**
      * Método que añade una pared al nivel.
      *
      * @param r Un rectángulo que representa la pared.
@@ -111,6 +103,14 @@ public class Level {
     public void addWall(Rectangle r) {
         this.walls.add(r);
     } // Cierre del método
+
+    /**
+     * Método que añade una bomba al nivel.
+     *
+     */
+    public void addBomb(Bomb b) {
+        this.bombs.add(b);
+    }
 
     /**
      * Método que obtiene el identificador del nivel.
@@ -149,15 +149,6 @@ public class Level {
     } // Cierre del método
 
     /**
-     * Método que obtiene la lista de fuentes de vida de un nivel.
-     *
-     * @return List<LifeSource> La lista de fuentes de vida del nivel.
-     */
-    public List<LifeSource> getLifeSources() {
-        return lifeSources;
-    } // Cierre del método
-
-    /**
      * Método que obtiene la lista de paredes del nivel.
      *
      * @return List<Rectangle> La lista de paredes del nivel.
@@ -166,6 +157,14 @@ public class Level {
         return walls;
     } // Cierre del método
 
+    /**
+     * Método que obtiene la lista de bombas del nivel.
+     *
+     * @return List<Bomb> La lista de bombas del nivel.
+     */
+    public List<Bomb> getBombs() {
+        return bombs;
+    } // Cierre del método
     /**
      * Método que obtiene el punto de inicio del nivel.
      *

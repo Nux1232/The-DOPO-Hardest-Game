@@ -1,9 +1,9 @@
 package domain.level.builder;
 
+import domain.entities.Bomb;
 import domain.level.Level;
 import domain.entities.factory.EnemyFactory;
 import domain.entities.Coin;
-import domain.entities.LifeSource;
 import java.awt.Point;
 import java.awt.Rectangle;
 
@@ -13,7 +13,7 @@ import java.awt.Rectangle;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 02/05/2026
+ * @version 19/05/2026
  */
 
 public class ConcreteLevelBuilder implements LevelBuilder {
@@ -102,19 +102,6 @@ public class ConcreteLevelBuilder implements LevelBuilder {
     } // Cierre del método
 
     /**
-     * Método que añade una fuente de vida al nivel con su propio comportamiento.
-     *
-     * @param x La coordenada x de la fuente de vida.
-     * @param y La coordenada y de la fuente de vida.
-     * @return LevelBuilder El nivel construido.
-     */
-    @Override
-    public LevelBuilder addLifeSource(int x, int y) {
-        level.addLifeSource(new LifeSource(x, y));
-        return this;
-    } // Cierre del método
-
-    /**
      * Método que añade una pared al nivel con su propio comportamiento.
      *
      * @param x La coordenada x de la pared.
@@ -126,6 +113,18 @@ public class ConcreteLevelBuilder implements LevelBuilder {
     @Override
     public LevelBuilder addWall(int x, int y, int width, int height) {
         level.addWall(new Rectangle(x, y, width, height));
+        return this;
+    } // Cierre del método
+
+    /**
+     * Método que añade una bomba al nivel con su propio comportamiento.
+     *
+     * @param x La coordenada x de la bomba.
+     * @param y La coordenada y de la bomba.
+     */
+    @Override
+    public LevelBuilder addBomb(int x, int y) {
+        level.addBomb(new Bomb(x, y));
         return this;
     } // Cierre del método
 

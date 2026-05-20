@@ -16,6 +16,7 @@ import java.util.List;
 public class Enemy {
     private double x, y;
     private MovementStrategy movementStrategy;
+    private boolean isAlive = true;
 
     /**
      * Constructor de la clase Enemy.
@@ -44,6 +45,22 @@ public class Enemy {
      */
     public void setMovementStrategy(MovementStrategy strategy) {
         this.movementStrategy = strategy;
+    } // Cierre del método
+
+    /**
+     * Método que hace que el enemigo muera.
+     */
+    public void die() {
+        this.isAlive = false;
+    } // Cierre del método
+
+    /**
+     * Método que verifica si el enemigo esta vivo.
+     *
+     * @return boolean Determina si el enemigo esta vivo o no.
+     */
+    public boolean isAlive() {
+        return isAlive;
     } // Cierre del método
 
     /**
