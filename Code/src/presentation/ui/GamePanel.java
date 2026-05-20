@@ -1,15 +1,14 @@
 package presentation.ui;
 
 import domain.core.GameEngine;
+import domain.core.GameState;
 import domain.core.TheDopoHardestGame;
+import domain.core.GameObserver;
 import domain.entities.*;
 import domain.level.Level;
-import presentation.ui.observer.GameObserver;
 import javax.swing.JPanel;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.AffineTransform;
-import java.security.Key;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +24,8 @@ public class GamePanel extends JPanel implements GameObserver {
     private static final int WORLD_WIDTH = 800;
     private static final int WORLD_HEIGHT = 600;
     private final Set<Integer> pressedKeys = new HashSet<>();
+    private final PlayerKeyBindings firstPlayerBindings = PlayerKeyBindings.forArrowKeys();
+    private final PlayerKeyBindings secondPlayerBindings = PlayerKeyBindings.forWASD();
     private Runnable pauseAction;
     private final TheDopoHardestGame game;
 
@@ -36,7 +37,7 @@ public class GamePanel extends JPanel implements GameObserver {
         setPreferredSize(new Dimension(WORLD_WIDTH, WORLD_HEIGHT));
         setBackground(new Color(173, 216, 230));
         setFocusable(true);
-        GameEngine.getInstance().addObserver(this);
+        game.addObserver(this);
 
         addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
@@ -83,18 +84,20 @@ public class GamePanel extends JPanel implements GameObserver {
      * Método privado que maneja el movimiento del jugador.
      */
     private void keysLogic() {
-        Player p = game.getPlayers().get(0);
-        if (pressedKeys.contains(KeyEvent.VK_UP))    game.movePlayer(p, "UP");
-        if (pressedKeys.contains(KeyEvent.VK_DOWN))  game.movePlayer(p, "DOWN");
-        if (pressedKeys.contains(KeyEvent.VK_LEFT))  game.movePlayer(p, "LEFT");
-        if (pressedKeys.contains(KeyEvent.VK_RIGHT)) game.movePlayer(p, "RIGHT");
+        Player firstPlayer = game.getPlayers().get(0);
+        for(int keyCode : pressedKeys) {
+            String direction = firstPlayerBindings.getDirection(keyCode);
+            if(direction != null) {
+                game.movePlayer(firstPlayer, direction);
+            }
 
-        if (game.getPlayers().size() > 1) {
-            Player p2 = game.getPlayers().get(1);
-            if (pressedKeys.contains(KeyEvent.VK_W)) game.movePlayer(p2, "UP");
-            if (pressedKeys.contains(KeyEvent.VK_S)) game.movePlayer(p2, "DOWN");
-            if (pressedKeys.contains(KeyEvent.VK_A)) game.movePlayer(p2, "LEFT");
-            if (pressedKeys.contains(KeyEvent.VK_D)) game.movePlayer(p2, "RIGHT");
+            if(game.getPlayers().size() > 1) {
+                Player secondPlayer = game.getPlayers().get(1);
+                String secondDirection = secondPlayerBindings.getDirection(keyCode);
+                if(secondDirection != null) {
+                    game.movePlayer(secondPlayer, secondDirection);
+                }
+            }
         }
     } // Cierre del método
 
@@ -225,9 +228,9 @@ public class GamePanel extends JPanel implements GameObserver {
         if(!game.getPlayers().isEmpty()) {
             Player firstPlayer = game.getPlayers().get(0);
             String playerName = "Jugador 1";
-            String coinsFirstPlayerText = "Monedas: " + firstPlayer.getCollectedCoins() + "/" + game.getTotalCoins();
+            String firstPlayerCoinText = "Monedas: " + firstPlayer.getCollectedCoins() + "/" + game.getTotalCoins();
             String deathsFirstPlayerText = "Muertes: " + firstPlayer.getDeaths();
-            drawHudBox(g2, new String[]{playerName, coinsFirstPlayerText, deathsFirstPlayerText},
+            drawHudBox(g2, new String[]{playerName, firstPlayerCoinText, deathsFirstPlayerText},
                     margin, margin);
         }
 
@@ -339,6 +342,11 @@ public class GamePanel extends JPanel implements GameObserver {
      */
     @Override
     public void update() {
+        if(game.getGameState() != GameState.PLAYING) {
+            clearPressedKeys();
+            return;
+        }
+
         handleInput();
         repaint();
     } // Cierre del método

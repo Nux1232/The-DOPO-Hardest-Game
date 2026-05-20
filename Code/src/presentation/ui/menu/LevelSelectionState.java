@@ -11,7 +11,7 @@ import java.util.Arrays;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 09/05/2026
+ * @version 16/05/2026
  */
 public class LevelSelectionState implements MenuScreenState {
     public static final String NAME = "levelSelection";

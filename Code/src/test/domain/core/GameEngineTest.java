@@ -1,7 +1,5 @@
-package test.domain.core;
+package domain.core;
 
-import domain.core.GameEngine;
-import domain.core.GameState;
 import domain.entities.Coin;
 import domain.entities.Enemy;
 import domain.entities.Player;
@@ -13,14 +11,9 @@ import domain.level.Level;
 import domain.save.memento.GameMemento;
 import presentation.ui.GamePanel;
 
-import domain.core.GameEngine;
-import domain.core.GameState;
-import domain.core.TheDopoHardestGame;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -274,7 +267,7 @@ public class GameEngineTest {
         game.saveGame(saveFile);
         game.endGame();
 
-        GameMemento memento = game.loadGame(saveFile);
+        GameMemento memento = game.loadLevel(saveFile);
 
         assertTrue(saveFile.length() > 0, "save file should be written to disk");
         assertEquals("Player vs Player", memento.getMode(), "saved mode");
@@ -318,7 +311,7 @@ public class GameEngineTest {
         game.saveGame(saveFile);
         game.endGame();
 
-        GameMemento memento = game.loadGame(saveFile);
+        GameMemento memento = game.loadLevel(saveFile);
         game.clearPlayers();
         Player restoredPlayer = PlayerFactory.createPlayer("Jugador 1", memento.getSkin());
         game.addPlayer(restoredPlayer);

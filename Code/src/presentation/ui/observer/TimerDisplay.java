@@ -1,6 +1,7 @@
 package presentation.ui.observer;
 
 import domain.core.GameEngine;
+import domain.core.GameObserver;
 
 /**
  * Clase que muestra el tiempo del juego.
