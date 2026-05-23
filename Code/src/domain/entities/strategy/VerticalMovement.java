@@ -1,6 +1,6 @@
 package domain.entities.strategy;
 
-import domain.entities.Enemy;
+import domain.entities.Movable;
 
 import java.awt.*;
 import java.util.List;
@@ -27,15 +27,15 @@ public class VerticalMovement implements MovementStrategy {
     } // Cierre del constructor
 
     /**
-     * Método que permite mover al enemigo de forma vertical usando su propio
+     * Método que permite mover al objeto de forma vertical usando su propio
      * comportamiento.
      *
-     * @param enemy El enemigo que aplica el movimiento.
+     * @param object El objeto que aplica el movimiento.
      */
     @Override
-    public void move(Enemy enemy, List<Rectangle> walls) {
-        double newPositionX = enemy.getX();
-        double newPositionY = enemy.getY() + (speed * direction);
+    public void move(Movable object, List<Rectangle> walls) {
+        double newPositionX = object.getX();
+        double newPositionY = object.getY() + (speed * direction);
 
         Rectangle nextPosition = new Rectangle((int)newPositionX, (int)newPositionY, 15, 15);
         boolean wallColide = walls.stream().anyMatch(wall -> wall.intersects(nextPosition));
@@ -43,8 +43,8 @@ public class VerticalMovement implements MovementStrategy {
         if(wallColide) {
             direction *= -1;
         } else {
-            enemy.setX(newPositionX);
-            enemy.setY(newPositionY);
+            object.setX(newPositionX);
+            object.setY(newPositionY);
         }
     } // Cierre del método
 } // Cierre de la clase

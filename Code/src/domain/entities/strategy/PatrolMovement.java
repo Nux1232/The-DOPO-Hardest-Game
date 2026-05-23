@@ -1,6 +1,6 @@
 package domain.entities.strategy;
 
-import domain.entities.Enemy;
+import domain.entities.Movable;
 
 import java.awt.*;
 import java.util.List;
@@ -24,18 +24,18 @@ public class PatrolMovement implements MovementStrategy {
     /**
      * Método que implementa el movimiento de patrullaje.
      *
-     * @param enemy El enemigo que realiza el movimiento.
+     * @param object El objeto que realiza el movimiento.
      */
     @Override
-    public void move(Enemy enemy, List<Rectangle> walls) {
+    public void move(Movable object, List<Rectangle> walls) {
         if (firstRun) {
-            startX = enemy.getX();
-            startY = enemy.getY();
+            startX = object.getX();
+            startY = object.getY();
             firstRun = false;
         }
 
-        double newPositionX = enemy.getX();
-        double newPositionY = enemy.getY();
+        double newPositionX = object.getX();
+        double newPositionY = object.getY();
 
         if (horizontal) {
             newPositionX += speed * direction;
@@ -49,8 +49,8 @@ public class PatrolMovement implements MovementStrategy {
         if(wallColide) {
             direction *= -1;
         } else {
-            enemy.setX(newPositionX);
-            enemy.setY(newPositionY);
+            object.setX(newPositionX);
+            object.setY(newPositionY);
         }
     } // Cierre del método
 } // Cierre de la clase

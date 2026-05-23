@@ -13,7 +13,7 @@ import java.util.List;
  * @version 02/05/2026
  */
 
-public class Enemy {
+public class Enemy implements Movable {
     private double x, y;
     private MovementStrategy movementStrategy;
     private boolean isAlive = true;

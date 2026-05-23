@@ -14,6 +14,7 @@ import presentation.ui.menu.MenuScreenState;
 import presentation.ui.menu.ModeSelectionState;
 import presentation.ui.menu.LevelCompletedState;
 import presentation.ui.menu.PauseMenuState;
+import presentation.ui.menu.TimeExpiredState;
 import domain.save.memento.GameCaretaker;
 import domain.save.memento.GameMemento;
 
@@ -62,8 +63,18 @@ public class MainWindow extends JFrame implements MenuContext {
         changeState(new ModeSelectionState());
 
         // Registrar observadores
-        game.addObserver(this::showLevelCompletedIfNeeded);
-        game.addObserver(this::showTimeExpiredIfNeeded);
+        game.addObserver(new GameObserver() {
+            @Override
+            public void update() {
+                MainWindow.this.showLevelCompletedIfNeeded();
+            }
+        });
+        game.addObserver(new GameObserver() {
+            @Override
+            public void update() {
+                MainWindow.this.showTimeExpiredIfNeeded();
+            }
+        });
     } // Cierre del constructor
 
     /**
@@ -182,6 +193,23 @@ public class MainWindow extends JFrame implements MenuContext {
     } // Cierre del método
 
     /**
+     * Método que reinicia la partida cuando se acaba el tiempo.
+     * Si no está en el primer nivel, lo devuelve al primer nivel.
+     * Si ya está en el primer nivel, lo reinicia.
+     */
+    @Override
+    public void restartTimeExpiredGame() {
+        File firstLevelFile = findFirstLevelFile();
+        File currentLevelFile = menuData.getSelectedLevelFile();
+
+        if (firstLevelFile != null && currentLevelFile != null && !currentLevelFile.getName().equals(firstLevelFile.getName())) {
+            menuData.setSelectedLevelFile(firstLevelFile);
+        }
+
+        startSelectedGame();
+    } // Cierre del método
+
+    /**
      * Método privado que encuentra el siguiente nivel.
      *
      * @return File el siguiente nivel.
@@ -243,19 +271,7 @@ public class MainWindow extends JFrame implements MenuContext {
 
         timeExpiredScreenVisible = true;
         SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(this,
-                    "Se acabó el tiempo, has perdido :(",
-                    "Tiempo agotado",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-            File firstLevelFile = findFirstLevelFile();
-            if (firstLevelFile == null) {
-                returnToMainMenu();
-                return;
-            }
-
-            menuData.setSelectedLevelFile(firstLevelFile);
-            startSelectedGame();
+            changeState(new TimeExpiredState());
         });
     } // Cierre del método
 

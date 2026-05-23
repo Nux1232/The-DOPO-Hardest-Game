@@ -1,12 +1,12 @@
 package domain.entities.strategy;
 
-import domain.entities.Enemy;
+import domain.entities.Movable;
 
 import java.awt.*;
 import java.util.List;
 
 /**
- * Clase que implementa el movimiento circular de un enemigo.
+ * Clase que implementa el movimiento circular de un objeto.
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
@@ -30,14 +30,14 @@ public class CircularMovement implements MovementStrategy {
     } // Cierre del constructor
 
     /**
-     * Método que permite mover al enemigo de forma circular.
+     * Método que permite mover al objeto de forma circular.
      *
-     * @param enemy El enemigo que aplica el movimiento.
+     * @param object El objeto que aplica el movimiento.
      */
     @Override
-    public void move(Enemy enemy, List<Rectangle> walls) {
+    public void move(Movable object, List<Rectangle> walls) {
         angle += speed;
-        enemy.setX(centerX + Math.cos(angle) * radius);
-        enemy.setY(centerY + Math.sin(angle) * radius);
+        object.setX(centerX + Math.cos(angle) * radius);
+        object.setY(centerY + Math.sin(angle) * radius);
     } // Cierre del método
 } // Cierre de la clase

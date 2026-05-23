@@ -12,6 +12,7 @@ import domain.entities.factory.GameModeFactory;
 import domain.entities.strategy.GameModeStrategy;
 import domain.save.memento.GameMemento;
 import java.awt.geom.Rectangle2D;
+import presentation.ui.GameObserver;
 
 /**
  * Clase que representa el motor del juego.

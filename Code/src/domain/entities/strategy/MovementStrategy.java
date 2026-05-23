@@ -1,6 +1,6 @@
 package domain.entities.strategy;
 
-import domain.entities.Enemy;
+import domain.entities.Movable;
 import java.awt.Rectangle;
 import java.util.List;
 
@@ -13,5 +13,5 @@ import java.util.List;
  */
 
 public interface MovementStrategy {
-    void move(Enemy enemy, List<Rectangle> walls);
+    void move(Movable object, List<Rectangle> walls);
 } // Cierre de la interfaz

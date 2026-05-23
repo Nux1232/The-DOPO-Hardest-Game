@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import presentation.ui.GameObserver;
 
 /**
  * La clase principal del juego en la capa de dominio.
@@ -284,6 +285,15 @@ public class TheDopoHardestGame {
      */
     public Level getCurrentLevel() {
         return engine.getCurrentLevel();
+    } // Cierre del método
+
+    /**
+     * Método que obtiene los enemigos del nivel actual.
+     *
+     * @return List<domain.entities.Enemy> La lista de enemigos del nivel actual.
+     */
+    public List<domain.entities.Enemy> getEnemies() {
+        return getCurrentLevel() != null ? getCurrentLevel().getEnemies() : new ArrayList<>();
     } // Cierre del método
 
     /**

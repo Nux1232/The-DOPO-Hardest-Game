@@ -1,7 +1,6 @@
 package presentation.ui.observer;
 
 import java.awt.*;
-import domain.core.GameObserver;
 
 /**
  * Clase que representa la pantalla de victoria.
