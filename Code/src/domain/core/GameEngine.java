@@ -188,6 +188,7 @@ public class GameEngine implements Runnable {
             remainingTime = 0;
             currentState = GameState.GAME_OVER;
             running = false;
+            notifyObservers();
         }
     } // Cierre del método
 
