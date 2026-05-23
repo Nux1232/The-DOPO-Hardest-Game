@@ -219,6 +219,15 @@ public class TheDopoHardestGame {
     } // Cierre del método
 
     /**
+     * Método que obtiene el nombre del modo de juego actual.
+     *
+     * @return String El nombre del modo de juego.
+     */
+    public String getGameMode() {
+        return engine.getCurrentModeName();
+    } // Cierre del método
+
+    /**
      * Método que permite cargar un nivel guardado.
      *
      * @param saveFile El nivel guardado que se va a jugar.

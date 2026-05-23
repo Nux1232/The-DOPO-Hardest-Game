@@ -91,7 +91,7 @@ public class GamePanel extends JPanel implements GameObserver {
                 game.movePlayer(firstPlayer, direction);
             }
 
-            if(game.getPlayers().size() > 1) {
+            if(game.getPlayers().size() > 1 && !game.getGameMode().equals("Player vs Machine")) {
                 Player secondPlayer = game.getPlayers().get(1);
                 String secondDirection = secondPlayerBindings.getDirection(keyCode);
                 if(secondDirection != null) {

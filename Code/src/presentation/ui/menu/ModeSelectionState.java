@@ -35,7 +35,7 @@ public class ModeSelectionState implements MenuScreenState {
         JLabel title = MenuStyles.title("The DOPO Hardest Game");
         JButton playerButton = MenuStyles.primaryButton("Player");
         JButton pvpButton = MenuStyles.primaryButton("Player vs Player");
-        JButton pvmButton = MenuStyles.disabledButton("Player vs Machine - Proximamente");
+        JButton pvmButton = MenuStyles.primaryButton("Player vs Machine");
         JButton loadButton = MenuStyles.secondaryButton("Cargar Partida");
         JButton exitButton = MenuStyles.secondaryButton("Salir del juego");
 
@@ -46,6 +46,11 @@ public class ModeSelectionState implements MenuScreenState {
 
         pvpButton.addActionListener(event -> {
             context.getMenuData().setSelectedMode("Player vs Player");
+            context.changeState(new PlayerCustomizationState());
+        });
+
+        pvmButton.addActionListener(event -> {
+            context.getMenuData().setSelectedMode("Player vs Machine");
             context.changeState(new PlayerCustomizationState());
         });
 
