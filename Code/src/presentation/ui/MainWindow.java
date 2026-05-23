@@ -123,6 +123,10 @@ public class MainWindow extends JFrame implements MenuContext {
                 Player secondPlayer = PlayerFactory.createPlayer("Jugador 2", menuData.getSecondSelectedSkin());
                 secondPlayer.setBorderColor(menuData.getSelectedSecondBorderColor());
                 game.addPlayer(secondPlayer);
+            } else if(menuData.getSelectedMode().equals("Player vs Machine")) {
+                Player secondPlayer = PlayerFactory.createPlayer("Máquina", "CLYDE");
+                secondPlayer.setBorderColor(Color.BLACK);
+                game.addPlayer(secondPlayer);
             }
 
             GameConfiguration configuration = new GameConfiguration(levelFile.getPath());

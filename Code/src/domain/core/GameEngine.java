@@ -550,10 +550,15 @@ public class GameEngine implements Runnable {
         }
     }
 
-    private String getCurrentModeName() {
-        return gameMode.getClass().getSimpleName().equals("PlayerVsPlayer")
-                ? "Player vs Player"
-                : "Player";
+    public String getCurrentModeName() {
+        String modeName = gameMode.getClass().getSimpleName();
+        if (modeName.equals("PlayerVsPlayer")) {
+            return "Player vs Player";
+        } else if (modeName.equals("PlayerVsMachine")) {
+            return "Player vs Machine";
+        } else {
+            return "Player";
+        }
     }
 
     public void setCurrentLevelFile(File currentLevel) {

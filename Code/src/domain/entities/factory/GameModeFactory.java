@@ -2,6 +2,7 @@ package domain.entities.factory;
 
 import domain.entities.strategy.GameModeStrategy;
 import domain.entities.strategy.PlayerVsPlayer;
+import domain.entities.strategy.PlayerVsMachine;
 import domain.entities.strategy.SinglePlayer;
 
 public class GameModeFactory {
@@ -12,6 +13,10 @@ public class GameModeFactory {
             case "PLAYER VS PLAYER":
             case "PLAYERVSPLAYER":
                 return new PlayerVsPlayer();
+            case "PVM":
+            case "PLAYER VS MACHINE":
+            case "PLAYERVSMACHINE":
+                return new PlayerVsMachine();
             case "PLAYER":
             case "SINGLEPLAYER":
             default:
