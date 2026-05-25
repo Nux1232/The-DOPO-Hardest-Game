@@ -1,7 +1,7 @@
 package presentation.ui.observer;
 
 import domain.core.GameEngine;
-import domain.core.GameObserver;
+import presentation.ui.GameObserver;
 import domain.entities.Player;
 
 /**
@@ -12,7 +12,7 @@ import domain.entities.Player;
  * @version 01/05/2026
  */
 
-public class ScoreBoard implements GameObserver {
+public class ScoreBoard extends GameObserver {
 
     /**
      * Método que actualiza el estado del juego para mostrar
