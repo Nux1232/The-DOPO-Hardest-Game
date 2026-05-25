@@ -26,8 +26,6 @@ import java.lang.reflect.Method;
 
 public class ExtraLivesTest {
 
-    // ========== Tests de Player.addExtraLife() y getExtraLives() ==========
-
     @Test
     @DisplayName("un jugador nuevo empieza con 0 vidas extras")
     void newPlayerStartsWithZeroExtraLives() {

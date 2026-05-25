@@ -30,10 +30,11 @@ public class LifeSource extends SpecialElement {
 
     } // Cierre del método
 
+    // No tener en cuenta pq esto no se usa
     @Override
     public void onEnemyContact(Enemy enemy) {
 
-    }
+    } // Cierre del método
 
     /**
      * Método que retorna la coordenada x de la fuente de vida.

@@ -172,7 +172,6 @@ public class MainWindow extends JFrame implements MenuContext {
 
         try {
             menuData.setSelectedLevelFile(nextLevelFile);
-            // Resetear jugadores para el siguiente nivel sin recrearlos
             for (Player p : game.getPlayers()) {
                 p.resetForNextLevel();
             }
@@ -398,6 +397,11 @@ public class MainWindow extends JFrame implements MenuContext {
         return gamePanel;
     } // Cierre del método
 
+    /**
+     * Método que obtiene el directorio de recursos del nivel.
+     *
+     * @return File El archivo que contiene la información del nivel.
+     */
     private File getLevelResourcesDirectory() {
         File sourceResources = new File("src/resources");
 
@@ -406,5 +410,5 @@ public class MainWindow extends JFrame implements MenuContext {
         }
 
         return new File("resources");
-    }
+    } // Cierre del método
 } // Cierre de la clase

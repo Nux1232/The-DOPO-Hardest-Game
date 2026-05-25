@@ -113,12 +113,10 @@ public abstract class Player {
             currentSpeed = baseSpeed * 0.7;
             isInvincible = true;
             invincibilityTimer = 60;
-            System.out.println("¡Escudo roto! Velocidad reducida.");
         } else if (extraLives > 0) {
             extraLives--;
             isInvincible = true;
             invincibilityTimer = 60;
-            System.out.println("¡Vida extra usada!");
         } else {
             die();
         }

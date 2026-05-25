@@ -39,7 +39,6 @@ public class Clyde extends Player {
             isInvincible = true;
             invincibilityTimer = INVINCIBILITY_FRAMES;
         } else {
-            // Delegar al padre para que maneje extraLives y die()
             super.handleHit();
         }
     } // Cierre del método

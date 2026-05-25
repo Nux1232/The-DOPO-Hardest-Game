@@ -19,7 +19,7 @@ import presentation.ui.GameObserver;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 16/05/2026
+ * @version 24/05/2026
  */
 
 public class GameEngine implements Runnable {
@@ -216,10 +216,6 @@ public class GameEngine implements Runnable {
             case "DOWN":  newY += speed; break;
             case "LEFT":  newX -= speed; break;
             case "RIGHT": newX += speed; break;
-            case "W": newY -= speed; break;
-            case "S": newY += speed; break;
-            case "A": newX -= speed; break;
-            case "D": newX += speed; break;
         }
         boolean blocked = collidesWithWall(newX, newY, size);
         if (!blocked) {
@@ -580,13 +576,13 @@ public class GameEngine implements Runnable {
     }
 
     public String getCurrentModeName() {
-        String modeName = gameMode.getClass().getSimpleName();
+        String modeName = gameMode.getName();
         if (modeName.equals("PlayerVsPlayer")) {
             return "Player vs Player";
         } else if (modeName.equals("PlayerVsMachine")) {
             return "Player vs Machine";
         } else {
-            return "Player";
+            return "SinglePlayer";
         }
     }
 
