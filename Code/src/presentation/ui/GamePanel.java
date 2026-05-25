@@ -346,6 +346,7 @@ public class GamePanel extends JPanel {
             case "RED": return Color.RED;
             case "BLUE": return Color.BLUE;
             case "GREEN": return Color.GREEN;
+            case "WHITE": return Color.WHITE;
             default: return Color.YELLOW;
         }
     } // Cierre del método

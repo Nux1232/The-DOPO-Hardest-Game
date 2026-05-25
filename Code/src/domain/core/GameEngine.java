@@ -36,6 +36,10 @@ public class GameEngine implements Runnable {
     private GameModeStrategy gameMode = GameModeFactory.createGameMode("Player");
     private int remainingTime = 180;
     private File currentLevelFile;
+    private boolean timeStopped;
+    private int timeStopTimer;
+    private static final int WHITE_COIN_EFFECT_FRAMES = 180;
+
 
     /**
      * El constructor privado de la clase GameEngine.
@@ -163,9 +167,11 @@ public class GameEngine implements Runnable {
 
         for(Player p: players) p.update();
         List<Rectangle> walls = currentLevel.getWalls();
-        for (Enemy e : currentLevel.getEnemies()) {
-            if (e.isAlive()) {
-                e.update(walls);
+        if(!timeStopped) {
+            for (Enemy e : currentLevel.getEnemies()) {
+                if (e.isAlive()) {
+                    e.update(walls);
+                }
             }
         }
         checkCollisions();
@@ -174,6 +180,7 @@ public class GameEngine implements Runnable {
         checkLifeSourceCollection();
         checkIntermediateZone();
         checkLevelCompletion();
+        updateTimeStopEffect();
     } // Cierre del método
 
     /**
@@ -181,6 +188,7 @@ public class GameEngine implements Runnable {
      */
     public void advanceGameClockOneSecond() {
         if (currentState != GameState.PLAYING) return;
+        if (timeStopped) return;
         if (remainingTime > 0) {
             remainingTime--;
         }
@@ -368,6 +376,23 @@ public class GameEngine implements Runnable {
         if (type.equals("RED")) p.applySkin("ROJO", 1.25, 1.0);
         else if (type.equals("BLUE")) p.applySkin("AZUL", 1.75, 1.5);
         else if (type.equals("GREEN")) p.applySkin("VERDE", 1.25, 1.0);
+        else if (type.equals("WHITE")) activateTimeStop(p);
+    } // Cierre del método
+
+    private void activateTimeStop(Player player) {
+        timeStopped = true;
+        timeStopTimer = WHITE_COIN_EFFECT_FRAMES;
+        player.makeInvincible(WHITE_COIN_EFFECT_FRAMES + 1);
+    } // Cierre del método
+
+    private void updateTimeStopEffect() {
+        if(!timeStopped) return;
+
+        timeStopTimer--;
+        if(timeStopTimer <= 0) {
+            timeStopped = false;
+            timeStopTimer = 0;
+        }
     } // Cierre del método
 
     private void checkLevelCompletion() {
@@ -420,6 +445,8 @@ public class GameEngine implements Runnable {
         this.currentLevel = level;
         this.currentState = GameState.PLAYING;
         this.remainingTime = level.getTimeLimit();
+        this.timeStopped = false;
+        this.timeStopTimer = 0;
         gameMode.setUp(players);
 
         for (int i = 0; i < players.size(); i++) {

@@ -130,6 +130,17 @@ public abstract class Player {
     } // Cierre del método
 
     /**
+     * Método que vuelve invencible al jugador por una cantidad de frames.
+     *
+     * @param frames La duración de la invencibilidad.
+     */
+    public void makeInvincible(int frames) {
+        if(frames <= 0) return;
+        this.isInvincible = true;
+        this.invincibilityTimer = Math.max(this.invincibilityTimer, frames);
+    } // Cierre del método
+
+    /**
      * Método que permite que un jugador muera.
      */
     protected void die() {
