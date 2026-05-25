@@ -1,11 +1,11 @@
 package domain.entities.strategy;
 
-import domain.entities.Enemy;
+import domain.entities.Movable;
 import java.awt.Rectangle;
 import java.util.List;
 
 /**
- * Clase que implementa el movimiento lineal de los enemigos.
+ * Clase que implementa el movimiento lineal de los objetos.
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
@@ -29,14 +29,14 @@ public class LinearMovement implements MovementStrategy {
     } // Cierre del constructor
 
     /**
-     * Método que permite mover al enemigo de forma lineal.
+     * Método que permite mover al objeto de forma lineal.
      *
-     * @param enemy El enemigo que aplica el movimiento.
+     * @param object El objeto que aplica el movimiento.
      */
     @Override
-    public void move(Enemy enemy, List<Rectangle> walls) {
-        double newPositionX = enemy.getX();
-        double newPositionY = enemy.getY();
+    public void move(Movable object, List<Rectangle> walls) {
+        double newPositionX = object.getX();
+        double newPositionY = object.getY();
 
         if (horizontal) {
             newPositionX += speed * direction;
@@ -50,8 +50,8 @@ public class LinearMovement implements MovementStrategy {
         if(wallColide) {
             direction *= -1;
         } else {
-            enemy.setX(newPositionX);
-            enemy.setY(newPositionY);
+            object.setX(newPositionX);
+            object.setY(newPositionY);
         }
     } // Cierre del método
 } // Cierre de la clase

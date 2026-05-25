@@ -14,6 +14,7 @@ public interface MenuContext {
     void changeState(MenuScreenState state);
     void startSelectedGame();
     void startNextLevel();
+    void restartTimeExpiredGame();
     void loadSavedGame();
     void saveGame();
     void resumeGame();

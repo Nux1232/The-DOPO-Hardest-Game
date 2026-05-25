@@ -3,7 +3,6 @@ package presentation.ui;
 import domain.core.GameEngine;
 import domain.core.GameState;
 import domain.core.TheDopoHardestGame;
-import domain.core.GameObserver;
 import domain.entities.*;
 import domain.level.Level;
 import javax.swing.JPanel;
@@ -20,7 +19,7 @@ import java.util.Set;
  * @version 09/05/2026
  */
 
-public class GamePanel extends JPanel implements GameObserver {
+public class GamePanel extends JPanel {
     private static final int WORLD_WIDTH = 800;
     private static final int WORLD_HEIGHT = 600;
     private final Set<Integer> pressedKeys = new HashSet<>();
@@ -37,7 +36,12 @@ public class GamePanel extends JPanel implements GameObserver {
         setPreferredSize(new Dimension(WORLD_WIDTH, WORLD_HEIGHT));
         setBackground(new Color(173, 216, 230));
         setFocusable(true);
-        game.addObserver(this);
+        game.addObserver(new GameObserver() {
+            @Override
+            public void update() {
+                GamePanel.this.update();
+            }
+        });
 
         addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
@@ -193,11 +197,9 @@ public class GamePanel extends JPanel implements GameObserver {
 
         // Enemigo
         g2.setColor(Color.BLUE);
-        if (game.getCurrentLevel() != null) {
-            for (Enemy e : game.getCurrentLevel().getEnemies()) {
-                if(!e.isAlive()) continue;
-                g2.fillOval((int)e.getX() - diameter/2, (int)e.getY() - diameter/2, diameter, diameter);
-            }
+        for (Enemy e : game.getEnemies()) {
+            if(!e.isAlive()) continue;
+            g2.fillOval((int)e.getX() - diameter/2, (int)e.getY() - diameter/2, diameter, diameter);
         }
 
         // Jugador
@@ -372,7 +374,6 @@ public class GamePanel extends JPanel implements GameObserver {
     /**
      * Método que actualiza el estado del juego (Su visualización).
      */
-    @Override
     public void update() {
         if(game.getGameState() != GameState.PLAYING) {
             clearPressedKeys();
