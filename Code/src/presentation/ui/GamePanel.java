@@ -204,8 +204,9 @@ public class GamePanel extends JPanel {
 
         // Jugador
         for (Player p : game.getPlayers()) {
+            // Parpadeo durante invencibilidad
             if (p.isInvincible() && (p.getInvincibilityTimer() / 5) % 2 == 0) {
-                continue;
+                continue; // No dibujar en frames alternos para efecto de parpadeo
             }
             g2.setColor(parsePlayerColor(p.getColor()));
             int size = (int)(20 * p.getSizeMultiplier());

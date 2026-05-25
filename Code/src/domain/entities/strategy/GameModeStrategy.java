@@ -13,5 +13,4 @@ public interface GameModeStrategy {
     boolean independentGameModeCoins();
     default void playerFinished (int playerAmount) {}
     void checkLevelCompletion(List<Player> players, Level level);
-    String getName();
 } // Cierre de la interfaz

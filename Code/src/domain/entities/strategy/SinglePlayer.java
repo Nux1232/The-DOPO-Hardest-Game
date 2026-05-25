@@ -98,12 +98,4 @@ public class SinglePlayer implements GameModeStrategy {
             this.levelFinished = true;
         }
     } // Cierre del método
-
-    /**
-     * Método que retorna el nombre del modo de juego.
-     * @return String El nombre del modo de juego.
-     */
-    public String getName() {
-        return "SinglePlayer";
-    } // Cierre del método
 } // Cierre de la clase

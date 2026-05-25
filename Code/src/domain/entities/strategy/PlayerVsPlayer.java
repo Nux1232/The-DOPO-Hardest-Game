@@ -125,12 +125,4 @@ public class PlayerVsPlayer implements GameModeStrategy {
             }
         }
     } // Cierre del método
-
-    /**
-     * Método que retorna el nombre del modo de juego.
-     * @return String El nombre del modo de juego.
-     */
-    public String getName() {
-        return "PlayerVsPlayer";
-    } // Cierre del método
 } // Cierre de la clase

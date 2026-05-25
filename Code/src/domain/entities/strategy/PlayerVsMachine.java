@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Juan Pablo Cuervo Contreras
  * @author David Felipe Ortiz Salcedo
- * @version 24/05/2026
+ * @version 23/05/2026
  */
 public class PlayerVsMachine implements GameModeStrategy {
     private List<Player> players;
@@ -23,30 +23,18 @@ public class PlayerVsMachine implements GameModeStrategy {
     private int levelFinished = 0;
 
     /**
-     * Clase que busca el mejor camino usando BFS.
+     * Nodo para el buscador de caminos BFS.
      */
     private static class PathNode {
         int x, y;
         PathNode parent;
 
-        /**
-         * Constructor que guarda la posición y el nodo padre.
-         *
-         * @param x La posición en x.
-         * @param y La posición en y.
-         * @param parent El nodo padre del grafo.
-         */
         PathNode(int x, int y, PathNode parent) {
             this.x = x;
             this.y = y;
             this.parent = parent;
         }
 
-        /**
-         * Método que compara dos nodos para ver si son iguales.
-         * @param o El objeto a comparar (debe ser un PathNode).
-         * @return boolean Verifica si los nodos son iguales.
-         */
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -55,23 +43,12 @@ public class PlayerVsMachine implements GameModeStrategy {
             return this.x == other.x && this.y == other.y;
         }
 
-        /**
-         * Método que permite buscar objetos más rápido pero
-         * debe tener el mismo hash.
-         *
-         * @return int El bloque de datos (hash).
-         */
         @Override
         public int hashCode() {
             return Objects.hash(x, y);
         }
     }
 
-    /**
-     * Método que prepara los jugadores.
-     *
-     * @param players Los jugadores que van a jugar (bot y un jugador).
-     */
     @Override
     public void setUp(List<Player> players) {
         int amountPlayers = Math.min(2, players.size());
@@ -80,25 +57,11 @@ public class PlayerVsMachine implements GameModeStrategy {
         this.levelFinished = 0;
     } // Cierre del método
 
-    /**
-     * Verifica si el juego ha terminado.
-     *
-     * @param players Los jugadores que van a jugar (bot y un jugador).
-     * @param collectedCoins Las monedas obtenidas.
-     * @param totalCoins La cantidad total de monedas en la partida.
-     * @return
-     */
     @Override
     public boolean checkWinCondition(List<Player> players, int collectedCoins, int totalCoins) {
         return levelFinished >= 1;
     } // Cierre del método
 
-    /**
-     * Método que obtiene el ganador de la partida.
-     *
-     * @param players Los jugadores que van a jugar (bot y un jugador).
-     * @return Player El ganador de la partida.
-     */
     @Override
     public Player getWinner(List<Player> players) {
         int auxiliarWin = 0;
@@ -112,11 +75,6 @@ public class PlayerVsMachine implements GameModeStrategy {
         return players.get(auxiliarWin);
     } // Cierre del método
 
-    /**
-     * Método que retorna la lista de jugadores.
-     *
-     * @return List<Player> La lista de jugadores.
-     */
     @Override
     public List<Player> getPlayers() {
         return players;
@@ -129,22 +87,11 @@ public class PlayerVsMachine implements GameModeStrategy {
         }
     } // Cierre del método
 
-    /**
-     * Método que sobreescribe como se obtienen las monedas.
-     *
-     * @return boolean Verifica si se obtienen las monedas.
-     */
     @Override
     public boolean independentGameModeCoins() {
         return true;
     } // Cierre del método
 
-    /**
-     * Método que mira cómo se completó la partida.
-     *
-     * @param players Los jugadores que van a jugar (bot y un jugador).
-     * @param level El nivel actual.
-     */
     @Override
     public void checkLevelCompletion(List<Player> players, Level level) {
         // Mover a la máquina si está en la partida
@@ -172,8 +119,7 @@ public class PlayerVsMachine implements GameModeStrategy {
     } // Cierre del método
 
     /**
-     * Método que mueve al bot según el objetivo, buscando
-     * la mejor diección.
+     * Método que calcula y realiza el movimiento del bot (máquina) en cada tick.
      */
     private void moveMachine(Player bot, Level level) {
         // Si el bot ya cruzó la meta, no se mueve
@@ -191,7 +137,7 @@ public class PlayerVsMachine implements GameModeStrategy {
     } // Cierre del método
 
     /**
-     * Método que permite al bot encontrar la moneda o meta más cercana.
+     * Determina el objetivo actual del bot (recolectar monedas o ir a la meta).
      */
     private Point getBotTarget(Player bot, Level level) {
         List<Coin> coins = level.getCoins();
@@ -219,9 +165,7 @@ public class PlayerVsMachine implements GameModeStrategy {
     } // Cierre del método
 
     /**
-     * Método que implementa BFS para llegar a la mejor ruta posible
-     * si BFS no sirve, entonces usa greedy para encontrar la mejor
-     * ruta.
+     * Determina el siguiente movimiento usando BFS o codicioso de respaldo.
      */
     private String getNextMove(Player bot, Point target, List<Rectangle> walls) {
         int startX = (int) Math.round(bot.getX());
@@ -319,8 +263,10 @@ public class PlayerVsMachine implements GameModeStrategy {
     } // Cierre del método
 
     /**
-     * Método que utiliza el algoritmo greedy para darle una
-     * alternativa final al bot por si no encuentra la ruta.
+     * Verifica si la caja de colisión intersecta alguna pared.
+     */
+    /**
+     * Busca un movimiento legal simple que acerque al bot al objetivo.
      */
     private String getBestLegalMove(Player bot, Point target, List<Rectangle> walls) {
         String[] directions = {"UP", "DOWN", "LEFT", "RIGHT"};
@@ -353,8 +299,7 @@ public class PlayerVsMachine implements GameModeStrategy {
     } // Cierre del método
 
     /**
-     * Método que verifica que el bot se pueda mover sin que
-     * haya una pared en medio.
+     * Valida que el primer paso calculado por la IA no sea bloqueado por una pared.
      */
     private boolean canMove(Player bot, String direction, List<Rectangle> walls) {
         double nextX = bot.getX();
@@ -379,16 +324,6 @@ public class PlayerVsMachine implements GameModeStrategy {
         return !collidesWithWall(nextX, nextY, size, walls);
     } // Cierre del método
 
-    /**
-     * Método que verifica si el jugador (cualquiera de los dos)
-     * colisiona con una pared.
-     *
-     * @param x La posición en x.
-     * @param y La posición en y.
-     * @param size El tamaño del jugador.
-     * @param walls El tamaño de la pared.
-     * @return boolean Verifica si el jugador colisiona con una pared.
-     */
     private boolean collidesWithWall(double x, double y, double size, List<Rectangle> walls) {
         Rectangle2D.Double playerRect = new Rectangle2D.Double(x, y, size, size);
         for (Rectangle wall : walls) {
@@ -398,13 +333,4 @@ public class PlayerVsMachine implements GameModeStrategy {
         }
         return false;
     } // Cierre del método
-
-    /**
-     * Método que retorna el nombre del modo de juego.
-     *
-     * @return String El nombre del modo de juego.
-     */
-    public String getName() {
-        return "PlayerVsMachine";
-    } // Cierre del método
-} // Cierre de la clase
+}
